@@ -10,62 +10,47 @@
 {% block body %}
     <div class="row">
         <div class="col-md-8">
-            <div class="card-box">
-                <form action="{% url 'templates:create' %}" method="post">
+            <form action="{% url 'templates:create' %}" method="post" class="pl-3 pt-3 pb-3">
 
-                    {% csrf_token %}
+                {% csrf_token %}
 
-                    <div class="form-group">
-                        <p><label for="{{ form.title.id_for_label }}">Title</label></p>
-                        <p><input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="title" placeholder="Title"></p>
-                        {% for error in form.title.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                <div class="form-group">
+                    <p><label for="{{ form.title.id_for_label }}"><strong>Title</strong></label></p>
+                    <p><input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="title" placeholder="Title"></p>
+                    {% for error in form.title.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                </div>
+
+                <div class="form-group pt-3">
+                    <p><label for="{{ form.description.id_for_label }}"><strong>Description</strong></label></p>
+                    <p>If this checklist needs any extra information, describe it here. This will be displayed to anyone who is creating a new instance of this checklist.</p>
+
+                    <p><textarea name="description" class="form-control" rows="10" id="{{ form.description.id_for_label }}"></textarea></p>
+                    {% for error in form.description.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                </div>
+
+                <div class="form-group pt-3">
+                    <p><label for="{{ form.initial_items.id_for_label }}"><strong>Initial Items</strong></label></p>
+                    <p>You can optionally add checklist items here. They will be split into a single item per line.</p>
+
+                    <p><textarea name="initial_items" class="form-control" rows="10" id="{{ form.title.id_for_label }}"></textarea></p>
+                    {% for error in form.initial_items.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox checkbox-primary">
+                        <input type="checkbox" name="edit_immediately">
+                        <label for="checkbox1">
+                            I want to edit the items in this list immediately.
+                        </label>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <p><label for="{{ form.description.id_for_label }}">Description</label></p>
-
-                        <p>If this checklist needs any extra information, describe it here. This will be displayed to anyone who is creating
-                            a new instance of this checklist.</p>
-
-                        <p><textarea name="description" class="form-control" rows="10" id="{{ form.description.id_for_label }}"></textarea></p>
-                        {% for error in form.description.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
-                    </div>
-
-                    <div class="form-group">
-                        <p><label for="{{ form.initial_items.id_for_label }}">Initial Items</label></p>
-
-                        <p>You can optionally add checklist items here. They will be split into a single item per line.</p>
-
-                        <p><textarea name="initial_items" class="form-control" rows="10" id="{{ form.title.id_for_label }}"></textarea></p>
-                        {% for error in form.initial_items.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
-                    </div>
-
-                    <div class="form-group">
-                        <div class="checkbox checkbox-primary">
-                            <input type="checkbox" name="edit_immediately">
-                            <label for="checkbox1">
-                                I want to edit the items in this list immediately.
-                            </label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-default btn-primary">Create Checklist</button>
-                </form>
-            </div>
+                <button type="submit" class="btn btn-default btn-primary">Create Checklist</button>
+            </form>
         </div>
-        <div class="col-md-4">
-            <div class="portlet">
-                <div class="portlet-heading bg-inverse">
-                    <h3 class="portlet-title">Information</h3>
-                    <div class="clearfix"></div>
-                </div>
-                <div id="bg-info" class="panel-collapse collapse show">
-                    <div class="portlet-body">
-                        <p>This form creates a new checklist template. A useful template should be generic, so avoid special cases or instance-specific detail when creating them.</p>
-                        <p>As an example, <em>"Project Launch"</em> is a good name, but <em>"Armstrong Craven Project Launch"</em> is probably not.</p>
-                    </div>
-                </div>
-            </div>
+        <div class="col-md-4 pt-3 border-left">
+            <p>This form creates a new checklist template. A useful template should be generic, so avoid special cases or instance-specific detail when creating them.</p>
+            <p>As an example, <em>"Project Launch"</em> is a good name, but <em>"Help For Heroes Project Launch"</em> is probably not.</p>
         </div>
     </div>
 {% endblock %}

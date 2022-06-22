@@ -9,58 +9,32 @@
 {% block body %}
     <div class="row">
         <div class="col-md-8">
-            <div class="card-box">
-                <table class="table">
-                    <thead>
+            <table class="table table-borderless table-striped">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+                </thead>
+                {% for item in templates %}
                     <tr>
-                        <th>Title</th>
-                        <th class="text-right">Actions</th>
+                        <td class="align-middle">
+                            <a href="{% url "templates:detail" item.id %}">{{ item.title }}</a>
+                        </td>
+                        <td class="text-right">
+                            <!-- Launch -->
+                            <a class="btn btn-sm btn-primary" href="{% url "checklists:create" %}?template_id={{ item.id }}">
+                                <i class="bi bi-plus"></i> Create Checklist
+                            </a>
+                        </td>
                     </tr>
-                    </thead>
-                    {% for item in templates %}
-                        <tr>
-                            <td>
-                                <a href="{% url "templates:detail" item.id %}">{{ item.title }}</a>
-                            </td>
-                            <td class="text-right">
-                                <!-- Launch -->
-                                <a class="btn btn-sm btn-outline-primary" href="{% url "checklists:create" %}?template_id={{ item.id }}">
-                                    <span class="mdi mdi-share"></span>
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
+                {% endfor %}
+            </table>
         </div>
-
-        <div class="col-md-4">
-            <div class="portlet">
-                <div class="portlet-heading bg-inverse">
-                    <h3 class="portlet-title">Actions</h3>
-                    <div class="clearfix"></div>
-                </div>
-                <div id="bg-info" class="panel-collapse collapse show">
-                    <div class="portlet-body">
-                        <p><a class="btn btn-primary" href="{% url "templates:create" %}">Create template</a></p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="portlet">
-                <div class="portlet-heading bg-inverse">
-                    <h3 class="portlet-title">Information</h3>
-                    <div class="clearfix"></div>
-                </div>
-                <div id="bg-info" class="panel-collapse collapse show">
-                    <div class="portlet-body">
-                        <p>This is a list of all the checklist templates.</p>
-                        <p>While templates do have an 'owner', anyone can amend (or comment on) existing templates; we should work to refine these templates as often as possible.</p>
-                        <p>Working on these templates together will mean we can all spend time on more interesting activity.</p>
-                        <p>Problems or suggestions? <a href="mailto:jon@wearefarm.com?subject=Checklist%20App">jon@wearefarm.com</a></p>
-                    </div>
-                </div>
-            </div>
+        <div class="col-md-4 border-left pt-2 pb-2">
+            <p>This is the list of checklists templates</p>
+            <p><a class="btn btn-primary" href="{% url "templates:create" %}">Create template</a></p>
         </div>
+        
     </div>
 {% endblock %}
