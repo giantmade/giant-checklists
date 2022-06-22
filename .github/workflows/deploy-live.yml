@@ -14,19 +14,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
-      - name: Get Client Name from GitHub Repository
-        id: client_name
-        run: |
-          echo "--- Github Repository String ---"
-          echo "$GITHUB_REPOSITORY"
-          echo
-          CLIENT_NAME=${GITHUB_REPOSITORY##*/}
-          echo "--- Sanitised Github Repository String ---"
-          echo "$CLIENT_NAME"
-          echo
-          echo "CLIENT_NAME=$CLIENT_NAME" >> $GITHUB_ENV
-
+      
       - name: Push to dokku
         id: dokku_push
         uses: dokku/github-action@master
@@ -35,7 +23,7 @@ jobs:
           branch: ${{ github.head_ref }}
           ssh_host_key: ${{ secrets.SSH_LIVE_HOST_KEY }}
           git_push_flags: '-vvv'
-          git_remote_url: 'ssh://dokku@server.giantmade.net:22/live-${{ env.CLIENT_NAME }}'
+          git_remote_url: 'ssh://dokku@internal.giantmade.net:22/live-checklists'
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
