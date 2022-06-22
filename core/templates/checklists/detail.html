@@ -7,7 +7,7 @@
     <li class="breadcrumb-item active"><a href="{% url "checklists:delete" checklist.id %}">{{ checklist.title }}</a></li>
 {% endblock %}
 
-{% block page_title %}{{ checklist.title }}{% endblock %}
+{% block title %}{{ checklist.title }}{% endblock %}
 
 {% block body %}
     <div class="row">

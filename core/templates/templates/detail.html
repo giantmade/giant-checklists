@@ -8,7 +8,7 @@
     <li class="breadcrumb-item active"><a href="{% url "templates:detail" template.id %}">{{ template.title }}</a></li>
 {% endblock %}
 
-{% block page_title %}{{ template.title }}{% endblock %}
+{% block title %}{{ template.title }}{% endblock %}
 
 {% block body %}
 
