@@ -1,0 +1,32 @@
+<div class="modal fade" id="item-comment-{{ item.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span></button>
+                <h4 class="modal-title">Comments</h4>
+            </div>
+            <form action="{% url "checklists:item_comment" checklist.id item.id %}" method="post">
+                <div class="modal-body">
+                    {% for comment in item.comments %}
+                        <h5>On {{ comment.created_on }} {{ comment.author.first_name }} {{ comment.author.last_name }}</h5>
+                        <p>{{ comment.content }}</p>
+                    {% endfor %}
+
+                    <h5>Add comment</h5>
+
+                    <div class="form-group">
+                        {% csrf_token %}
+                        <textarea class="form-control" name="content" rows="5"></textarea>
+                        <p><br /><em>You can also push this comment back to the original checklist template. This may help others in future.</em></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Comment</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

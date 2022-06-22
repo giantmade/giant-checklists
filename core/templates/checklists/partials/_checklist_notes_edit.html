@@ -1,0 +1,23 @@
+<div class="modal fade" id="notes-{{ checklist.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span></button>
+                <h4 class="modal-title">Notes</h4>
+            </div>
+            <form action="{% url "checklists:edit_notes" checklist.id %}" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <textarea class="form-control" name="notes" rows="5">{{ checklist.notes }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Edit</input>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

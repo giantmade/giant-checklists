@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block header_title %}Checklists - {% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active"><a href="{% url "checklists:index" %}">Checklists</a></li>
+{% endblock %}
+
+{% block page_title %}Checklists{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card-box">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Progress</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in checklists %}
+                        <tr>
+                            <td>
+                                <a href="{% url "checklists:detail" item.id %}">{{ item.title }}</a>
+                            </td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar {% ifequal item.progress 100 %}bg-success{% endifequal %}" role="progressbar" style="width: {{ item.progress }}%" aria-valuenow="{{ item.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="portlet">
+                <div class="portlet-heading bg-inverse">
+                    <h3 class="portlet-title">Actions</h3>
+                    <div class="clearfix"></div>
+                </div>
+                <div id="bg-info" class="panel-collapse collapse show">
+                    <div class="portlet-body">
+                        <p>
+                            <a class="btn btn-primary m-r-10" href="{% url "checklists:create" %}">Create checklist</a>
+                            <a class="btn btn-primary" href="{% url "checklists:complete" %}">Show completed</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portlet">
+                <div class="portlet-heading bg-inverse">
+                    <h3 class="portlet-title">Information</h3>
+                    <div class="clearfix"></div>
+                </div>
+                <div id="bg-info" class="panel-collapse collapse show">
+                    <div class="portlet-body">
+                        <p>This is the list of currently active checklists.</p>
+                        <p>Checklists are owned by everyone, so take the opportunity to comment and help progress any checklists where you can.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit modals. -->
+    {% for item in templates %}
+        {% include "templates/partials/_template_edit_modal.html" %}
+    {% endfor %}
+
+    <!-- Delete modals. -->
+    {% for item in templates %}
+        {% include "templates/partials/_template_delete_modal.html" %}
+    {% endfor %}
+
+{% endblock %}

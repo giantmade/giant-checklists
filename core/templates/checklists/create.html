@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block header_title %}Create Checklist - {% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url "home" %}">Quality</a></li>
+    <li class="breadcrumb-item"><a href="{% url "checklists:index" %}">Checklists</a></li>
+    <li class="breadcrumb-item active">Create</li>
+{% endblock %}
+
+{% block page_title %}Create Checklist{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card-box">
+                <form action="{% url 'checklists:create' %}" method="post">
+                    {% csrf_token %}
+
+                    <!-- Template dropdown -->
+                    <div class="form-group">
+                        <p><label for="{{ form.template.id_for_label }}">Template</label></p>
+
+                        <p>
+                            <select class="form-control" id="{{ form.template.id_for_label }}" name="template">
+                                {% for value, display in form.template.field.choices %}
+                                    <option value="{{ value }}"{% ifequal value template_id %} selected="selected"{% endifequal %}>{{ display }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </p>
+                        {% for error in form.template.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <p><label for="{{ form.title.id_for_label }}">Title</label></p>
+                        <p>Give your checklist a descriptive title here. This should include some context for the job, eg. <em>"Shephard Launch Checklist"</em>.</p>
+                        <p><input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="title" placeholder="Title"></p>
+                        {% for error in form.title.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <p><label for="{{ form.notes.id_for_label }}">Notes</label></p>
+                        <p>Add any additional notes about the checklist here. It'll be visible to anyone who views this checklist. eg. <em>"This is the checklist to launch phase 2 of the client's project"</em>.</p>
+                        <p><textarea name="notes" class="form-control" rows="10" id="{{ form.notes.id_for_label }}"></textarea></p>
+                        {% for error in form.notes.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-default btn-primary">Create Checklist</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="portlet">
+                <div class="portlet-heading bg-inverse">
+                    <h3 class="portlet-title">Information</h3>
+                    <div class="clearfix"></div>
+                </div>
+                <div id="bg-info" class="panel-collapse collapse show">
+                    <div class="portlet-body">
+                        <p>This form creates a new checklist from a template.</p>
+                        <p>Once this checklist is created, it is independent of the template, and can be edited as necessary.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

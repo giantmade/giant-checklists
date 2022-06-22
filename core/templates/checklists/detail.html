@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block header_title %}{{ checklist.title }} - {% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url "checklists:index" %}">Checklists</a></li>
+    <li class="breadcrumb-item active"><a href="{% url "checklists:delete" checklist.id %}">{{ checklist.title }}</a></li>
+{% endblock %}
+
+{% block page_title %}{{ checklist.title }}{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card-box">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th width="190px;" class="text-right">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in checklist.items %}
+                        <tr>
+                            <td>
+                                {{ item.description }}
+                            </td>
+                            <td class="text-right">
+                                {% if item.completed %}
+                                    <!-- Mark incomplete -->
+                                    <button type="button" class="btn btn-outline-primary m-r-10" data-toggle="modal" data-target="#item-complete-toggle-{{ item.id }}">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                {% else %}
+                                    <!-- Mark complete -->
+                                    <button type="button" class="btn btn-outline-success m-r-10" data-toggle="modal" data-target="#item-complete-toggle-{{ item.id }}">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                {% endif %}
+                                <!-- Comment -->
+                                <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#item-comment-{{ item.id }}">
+                                <i class="bi bi-chat-square-text"></i>
+                                    {% if item.comments %}
+                                        <span class="badge">{{ item.comment_count }}</span>
+                                    {% endif %}
+                                </span>
+                                </button>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4 border-left">
+            <div class="portlet">
+                <div class="portlet-heading bg-inverse">
+                    <h3 class="portlet-title">Overall Progress</h3>
+                    <div class="clearfix"></div>
+                </div>
+                <div id="bg-info" class="panel-collapse collapse show">
+                    <div class="portlet-body">
+                        <!-- Overall progress bar -->
+                        <div class="progress progress-fat">
+                            <div class="progress-bar {% ifequal checklist.progress 100 %}bg-success{% endifequal %}" role="progressbar" aria-valuenow="{{ checklist.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ checklist.progress }}%"></div>
+                        </div>
+
+                        {% ifequal checklist.progress 100 %}
+                            <!-- Complete checklist toggle -->
+                            <form method="post" action="{% url "checklists:complete_toggle" checklist.id %}">
+                                {% csrf_token %}
+                                {% if checklist.completed %}
+                                    <button type="submit" class="btn btn-danger">Not Complete!</button>
+                                {% else %}
+                                    <button type="submit" class="btn {% ifequal checklist.progress 100 %}btn-primary{% else %}btn-default{% endifequal %}" {% ifnotequal checklist.progress 100 %}disabled="disabled"{% endifnotequal %}>Complete</button>
+                                {% endif %}
+                            </form>
+                        {% endifequal %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="portlet">
+                <div class="portlet-heading bg-inverse">
+                    <h3 class="portlet-title">Actions</h3>
+                    <div class="clearfix"></div>
+                </div>
+                <div id="bg-info" class="panel-collapse collapse show">
+                    <div class="portlet-body">
+                        <p>
+                            <a class="btn btn-danger" href="{% url "checklists:delete" checklist.id %}">Delete Checklist</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portlet">
+                <div class="portlet-heading bg-inverse">
+                    <h3 class="portlet-title">Notes</h3>
+                    <div class="clearfix"></div>
+                </div>
+                <div id="bg-info" class="panel-collapse collapse show">
+                    <div class="portlet-body">
+                        {% if checklist.notes %}
+                            <p>{{ checklist.notes|linebreaks }}</p>
+                            <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#notes-{{ checklist.id }}">Edit</a>
+                        {% else %}
+                            <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#notes-{{ checklist.id }}">Add notes</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if events %}
+                <div class="portlet">
+                    <div class="portlet-heading bg-inverse">
+                        <h3 class="portlet-title">Events</h3>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div id="bg-info" class="panel-collapse collapse show">
+                        <div class="portlet-body">
+                            <table class="table">
+                                {% for event in events %}
+                                    {% if all_events %}
+                                        <tr>
+                                            <td>
+                                                {% comment %} <img src="{% gravatar_url event.author.email 50 %}" alt="user" class="rounded-circle"><img src="{% static 'images/users/avatar-1.jpg' %}" alt="user" class="rounded-circle"> {% endcomment %}
+                                            </td>
+                                            <td>
+                                                <p>{{ event.message }}<br>
+                                                    <strong>{{ event.author.first_name }} {{ event.author.last_name }}</strong>, <em>{{ event.created_on }}</em></p>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        {% if forloop.counter0 < 5 %}
+                                            <tr>
+                                                <td>
+                                                    {% comment %} <img src="{% gravatar_url event.author.email 50 %}" alt="user" class="rounded-circle"> {% endcomment %}
+                                                </td>
+                                                <td>
+                                                    <p>{{ event.message }}<br>
+                                                        <strong>{{ event.author.first_name }} {{ event.author.last_name }}</strong>, <em>{{ event.created_on }}</em></p>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </table>
+                            {% if all_events %}
+                                <p><a class="btn btn-primary" href="{% url "checklists:detail" checklist.id %}">Recent events only</a></p>
+                            {% else %}
+                                <p><a class="btn btn-primary" href="{% url "checklists:detail" checklist.id %}?all_events">All events</a></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Item complete modals. -->
+    {% for item in checklist.items %}
+        {% include "checklists/partials/_checklistitem_complete.html" %}
+    {% endfor %}
+
+    <!-- Item comment modals. -->
+    {% for item in checklist.items %}
+        {% include "checklists/partials/_checklistitem_comment_modal.html" %}
+    {% endfor %}
+
+    <!-- Edit notes modal. -->
+    {% include "checklists/partials/_checklist_notes_edit.html" %}
+
+{% endblock %}

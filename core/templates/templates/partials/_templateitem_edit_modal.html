@@ -1,0 +1,24 @@
+<div class="modal fade" id="item-edit-{{ item.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span></button>
+                <h4 class="modal-title">Edit Item</h4>
+            </div>
+            <form action="{% url "templates:item_edit" template.id item.id %}" method="post" class="form-inline">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="description" value="{{ item.description }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Edit</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
