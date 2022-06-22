@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% url "home" %}">Quality</a></li>
     <li class="breadcrumb-item"><a href="{% url "checklists:index" %}">Checklists</a></li>
     <li class="breadcrumb-item active"><a href="{% url "checklists:complete" %}">Completed</a></li>
 {% endblock %}

@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 
-{% block header_title %}{{ checklist.title }} - {% endblock %}
-
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% url "home" %}">Quality</a></li>
     <li class="breadcrumb-item"><a href="{% url "checklists:index" %}">Checklists</a></li>
     <li class="breadcrumb-item"><a href="{% url "checklists:delete" checklist.id %}">{{ checklist.title }}</a></li>
     <li class="breadcrumb-item active">Delete</li>
