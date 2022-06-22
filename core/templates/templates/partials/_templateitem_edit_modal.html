@@ -2,8 +2,6 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span></button>
                 <h4 class="modal-title">Edit Item</h4>
             </div>
             <form action="{% url "templates:item_edit" template.id item.id %}" method="post" class="form-inline">

@@ -8,122 +8,85 @@
 {% block title %}{{ template.title }}{% endblock %}
 
 {% block body %}
-
     <div class="row">
         <div class="col-md-8">
-            <div class="card-box">
-                <table class="table">
-                    <thead>
+            <table class="table table-borderless table-striped">
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th class="text-right" style="width: 165px;">Actions</th>
+                </tr>
+                </thead>
+
+                <!-- Add item form -->
+                <tr>
+                    <form action="{% url 'templates:item_create' template.id %}" method="post">
+                        {% csrf_token %}
+                        <td class="pl-2">
+                            <input type="text" class="form-control form-control-sm" id="{{ form.title.id_for_label }}" name="description" placeholder="Description">
+                            {% for error in form.title.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-primary btn-sm btn-block">Add item</button>
+                        </td>
+                    </form>
+                </tr>
+
+                {% for item in template.items %}
                     <tr>
-                        <th>Item</th>
-                        <th class="text-right" style="width: 182px;">Actions</th>
+                        <td class="align-middle">
+                            {{ item.description }}
+                        </td>
+                        <td>
+
+                            <!-- Edit -->
+                            <button id="template-item-edit-button-{{ item.id }}" type="button" class="btn btn-primary btn-sm pull-left m-r-10" data-toggle="modal" data-target="#item-edit-{{ item.id }}">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+
+                            <!-- Delete -->
+                            <button type="button" class="btn btn-primary btn-sm pull-left m-r-10" data-toggle="modal" data-target="#item-delete-{{ item.id }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <!-- Move up -->
+                            <form action="{% url "templates:item_swap" template.id item.id item.previous_item.id %}" method="post" class="float-left mr-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm m-r-10">
+                                    <i class="bi bi-arrow-up"></i>
+                                </button>
+                            </form>
+
+                            <!-- Move down -->
+                            <form action="{% url "templates:item_swap" template.id item.id item.next_item.id %}" method="post" class="float-left mr-1">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-arrow-down"></i>
+                                </button>
+                            </form>
+
+                        </td>
                     </tr>
-                    </thead>
-
-                    <!-- Add item form -->
-                    <tr>
-                        <form action="{% url 'templates:item_create' template.id %}" method="post">
-                            {% csrf_token %}
-                            <td class="pl-1">
-                                <input type="text" class="form-control form-control-sm" id="{{ form.title.id_for_label }}" name="description" placeholder="Description">
-                                {% for error in form.title.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
-                            </td>
-                            <td>
-                                <button type="submit" class="btn btn-outline-primary btn-sm btn-block">
-                                    <span class="mdi mdi-check"></span> Add item
-                                </button>
-                            </td>
-                        </form>
-                    </tr>
-
-                    {% for item in template.items %}
-                        <tr>
-                            <td>
-                                {{ item.description }}
-                            </td>
-                            <td>
-
-                                <!-- Edit -->
-                                <button id="template-item-edit-button-{{ item.id }}" type="button" class="btn btn-outline-primary btn-sm pull-left m-r-10" data-toggle="modal" data-target="#item-edit-{{ item.id }}">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-
-                                <!-- Delete -->
-                                <button type="button" class="btn btn-outline-primary btn-sm pull-left m-r-10" data-toggle="modal" data-target="#item-delete-{{ item.id }}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-
-                                <!-- Move up -->
-                                <form action="{% url "templates:item_swap" template.id item.id item.previous_item.id %}" method="post" class="float-left mr-10">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-primary btn-sm m-r-10">
-                                        <i class="bi bi-arrow-up"></i>
-                                    </button>
-                                </form>
-
-                                <!-- Move down -->
-                                <form action="{% url "templates:item_swap" template.id item.id item.next_item.id %}" method="post" class="float-left pr-10">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-arrow-down"></i>
-                                    </button>
-                                </form>
-
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="portlet">
-                <div class="portlet-heading bg-inverse">
-                    <h3 class="portlet-title">Description</h3>
-                    <div class="clearfix"></div>
-                </div>
-                <div id="bg-info" class="panel-collapse collapse show">
-                    <div class="portlet-body">
-                        {% if template.description %}
-                            <p>{{ template.description }}</p>
-                        {% else %}
-                            <p>This template does not have a description.</p>
-                        {% endif %}
-                        <button id="template-description-{{ template.id }}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#description-{{ template.id }}">
-                            Edit Description
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="portlet">
-                <div class="portlet-heading bg-inverse">
-                    <h3 class="portlet-title">Actions</h3>
-                    <div class="clearfix"></div>
-                </div>
-                <div id="bg-info" class="panel-collapse collapse show">
-                    <div class="portlet-body">
-                        <button id="template-delete-{{ template.id }}" type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete-{{ template.id }}">
-                            Delete template
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="portlet">
-                <div class="portlet-heading bg-inverse">
-                    <h3 class="portlet-title">Information</h3>
-                    <div class="clearfix"></div>
-                </div>
-                <div id="bg-info" class="panel-collapse collapse show">
-                    <div class="portlet-body">
-                        <p>This is a list of all the checklist items.</p>
-                        <p>You can amend this list as necessary, but remember that any previously created 'instances' of this list will not be affected.</p>
-                        <p>Problems or suggestions? <a href="mailto:jon@wearefarm.com?subject=Checklist%20App">jon@wearefarm.com</a></p>
-                    </div>
-                </div>
-            </div>
+                {% endfor %}
+            </table>
         </div>
 
+        <div class="col-md-4 border-left pt-2">
+
+            <p>This is a list of all the checklist items.</p>
+            <p>You can amend this list as necessary, but remember that any previously created 'instances' of this list will not be affected.</p>
+ 
+            <p><strong>Description</strong></p>
+
+            {% if template.description %}
+                <p>{{ template.description }}</p>
+            {% else %}
+                <p>This template has not been given a description.</p>
+            {% endif %}
+
+            <p><button id="template-description-{{ template.id }}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#description-{{ template.id }}">Edit description</button></p>
+            <p><button id="template-delete-{{ template.id }}" type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete-{{ template.id }}">Delete template</button></p>
+        </div>
     </div>
 
     <!-- Template description modal. -->
