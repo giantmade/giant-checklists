@@ -2,8 +2,6 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span></button>
                 <h4 class="modal-title">Comments</h4>
             </div>
             <form action="{% url "checklists:item_comment" checklist.id item.id %}" method="post">
@@ -18,7 +16,7 @@
                     <div class="form-group">
                         {% csrf_token %}
                         <textarea class="form-control" name="content" rows="5"></textarea>
-                        <p><br /><em>You can also push this comment back to the original checklist template. This may help others in future.</em></p>
+                        <p><br /><em>Would this comment be useful to add to the checklist template?</em></p>
                     </div>
                 </div>
                 <div class="modal-footer">
