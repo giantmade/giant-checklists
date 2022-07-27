@@ -52,10 +52,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Black
-        uses: wearerequired/lint-action@v1
+        uses: wearerequired/lint-action@v2
         with:
           black: true
-          black_dir: ./src
+          black_dir: ./checklists
           black_args: "--verbose"
           auto_fix: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
