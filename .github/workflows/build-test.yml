@@ -45,9 +45,7 @@ jobs:
 
       - name: Install Python Packages
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: |
-          poetry env use /usr/bin/python3.9
-          poetry install --no-root --no-interaction --no-ansi
+        run: poetry install --no-root --no-interaction --no-ansi
 
       - name: Build Coverage File
         run: |
