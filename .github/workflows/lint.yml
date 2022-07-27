@@ -38,7 +38,7 @@ jobs:
       - name: Run Isort
         uses: isort/isort-action@master
         with:
-          sortPaths: ./src
+          sortPaths: ./checklists
           configuration: "--profile black"
 
       - name: Run Flake8
