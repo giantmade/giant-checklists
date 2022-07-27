@@ -1,7 +1,8 @@
 from django import forms
 
-from .models import Checklist
 from templates.models import Template
+
+from .models import Checklist
 
 
 class ChecklistForm(forms.ModelForm):

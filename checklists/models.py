@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
-
 from positions import PositionField, PositionManager
 
 from templates.models import Template, TemplateItem
+
 
 class Checklist(models.Model):
     """
