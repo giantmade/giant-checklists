@@ -1,10 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
-from . import forms
-from . import models
+from . import forms, models
 
 
 @never_cache
