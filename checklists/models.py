@@ -47,9 +47,11 @@ class ChecklistItem(models.Model):
     """
 
     checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE)
-    original_item = models.ForeignKey(TemplateItem, blank=True, null=True, on_delete=models.CASCADE)
+    original_item = models.ForeignKey(
+        TemplateItem, blank=True, null=True, on_delete=models.CASCADE
+    )
     description = models.TextField(max_length=255)
-    position = PositionField(collection='checklist')
+    position = PositionField(collection="checklist")
     notes = models.TextField(blank=True)
 
     completed = models.BooleanField(default=False)
@@ -62,7 +64,7 @@ class ChecklistItem(models.Model):
         Returns the comments for this item.
         """
 
-        return ChecklistItemComment.objects.filter(item=self).order_by('created_on')
+        return ChecklistItemComment.objects.filter(item=self).order_by("created_on")
 
     def comment_count(self):
         """
@@ -90,6 +92,7 @@ class ChecklistEvent(models.Model):
     def __str__(self):
         return self.message
 
+
 class ChecklistItemComment(models.Model):
     """
     This is a comment on a given checklist item.
@@ -102,4 +105,3 @@ class ChecklistItemComment(models.Model):
 
     def __str__(self):
         return self.content
-

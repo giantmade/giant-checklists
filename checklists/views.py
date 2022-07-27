@@ -15,9 +15,13 @@ def index(request):
 
     checklists = models.Checklist.objects.filter(completed=False)
 
-    return render(request, "checklists/index.html", {
-        'checklists': checklists,
-    })
+    return render(
+        request,
+        "checklists/index.html",
+        {
+            "checklists": checklists,
+        },
+    )
 
 
 @never_cache
@@ -29,9 +33,13 @@ def complete(request):
 
     checklists = models.Checklist.objects.filter(completed=True)
 
-    return render(request, "checklists/complete.html", {
-        'checklists': checklists,
-    })
+    return render(
+        request,
+        "checklists/complete.html",
+        {
+            "checklists": checklists,
+        },
+    )
 
 
 @never_cache
@@ -51,7 +59,7 @@ def create(request):
             checklist.save()
 
             # Add the child items.
-            for item in checklist.template.items().order_by('position'):
+            for item in checklist.template.items().order_by("position"):
                 checklist_item = models.ChecklistItem(
                     checklist=checklist,
                     original_item=item,
@@ -74,10 +82,10 @@ def create(request):
 
     # Yank the template_id from the querystring, if it's set.
     template_id = False
-    if 'template_id' in request.GET:
-        template_id = int(request.GET['template_id'])
+    if "template_id" in request.GET:
+        template_id = int(request.GET["template_id"])
 
-    return render(request, "checklists/create.html", {'form': form, 'template_id': template_id})
+    return render(request, "checklists/create.html", {"form": form, "template_id": template_id})
 
 
 @never_cache
@@ -88,16 +96,20 @@ def detail(request, checklist_id):
     """
 
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
-    events = models.ChecklistEvent.objects.filter(checklist=checklist).order_by('-created_on')
+    events = models.ChecklistEvent.objects.filter(checklist=checklist).order_by("-created_on")
 
     # Check for the 'all events' flag. If this is false, only show 5 recent events in the event list.
-    all_events = 'all_events' in request.GET
+    all_events = "all_events" in request.GET
 
-    return render(request, "checklists/detail.html", {
-        'checklist': checklist,
-        'events': events,
-        'all_events': all_events,
-    })
+    return render(
+        request,
+        "checklists/detail.html",
+        {
+            "checklist": checklist,
+            "events": events,
+            "all_events": all_events,
+        },
+    )
 
 
 @never_cache
@@ -113,7 +125,7 @@ def delete(request, checklist_id):
         checklist.delete()
         return redirect("checklists:index")
 
-    return render(request, "checklists/delete.html", {'checklist': checklist})
+    return render(request, "checklists/delete.html", {"checklist": checklist})
 
 
 @never_cache
@@ -126,7 +138,7 @@ def edit_notes(request, checklist_id):
 
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
-    checklist.notes = request.POST['notes']
+    checklist.notes = request.POST["notes"]
     checklist.save()
 
     return redirect("checklists:detail", checklist_id=checklist.id)
@@ -224,7 +236,7 @@ def item_comment(request, checklist_id, item_id):
     comment = models.ChecklistItemComment(
         item=item,
         author=request.user,
-        content=request.POST['content'],
+        content=request.POST["content"],
     )
     comment.save()
 
