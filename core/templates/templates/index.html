@@ -18,10 +18,10 @@
                 </thead>
                 {% for item in templates %}
                     <tr>
-                        <td class="align-middle">
+                        <td class="align-middle col-sm-8">
                             <a href="{% url "templates:detail" item.id %}">{{ item.title }}</a>
                         </td>
-                        <td class="text-right">
+                        <td class="text-right col-sm">
                             <!-- Launch -->
                             <a class="btn btn-sm btn-primary" href="{% url "checklists:create" %}?template_id={{ item.id }}">
                                 <i class="bi bi-plus"></i> Create Checklist
