@@ -1,0 +1,74 @@
+---
+name: Build & Test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    name: Poetry, Pytest, Pytest-Cov
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out Source Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install System Packages
+        run: |
+          sudo apt-get update 
+          sudo apt-get -y --no-install-recommends install build-essential python3-dev curl make default-libmysqlclient-dev
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@main
+        with:
+          python-version: "3.9.x"
+
+      - name: Load Cached Poetry Installation
+        uses: actions/cache@v2
+        with:
+          path: ~/.local
+          key: poetry-0
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Load Cached Python Packages
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Python Packages
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-root --no-interaction --no-ansi
+
+      - name: Build Coverage File
+        run: |
+          poetry run pytest src | tee pytest-coverage.txt
+        env:
+          DJANGO_SETTINGS_MODULE: core.settings
+          DEPLOY_ENV: test
+          SECRET_KEY: test-key
+          EMAIL_URL: console://
+
+      - name: Write Coverage Report Comment
+        id: coverage_comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+
+      # - name: Create the Badge
+      #   uses: schneegans/dynamic-badges-action@v1.0.0
+      #   with:
+      #     auth: ${{ secrets.PYTEST_COVERAGE_COMMENT }}
+      #     gistID: 5e90d640f8c212ab7bbac38f72323f80 # this needs to be unique to each project
+      #     filename: pytest-coverage-comment__main.json
+      #     label: Coverage Report
+      #     message: ${{ steps.coverageComment.outputs.coverage }}
+      #     color: ${{ steps.coverageComment.outputs.color }}
+      #     namedLogo: python
