@@ -50,6 +50,7 @@ jobs:
       - name: Build Coverage File
         run: |
           poetry run pytest src | tee pytest-coverage.txt
+          if grep -q "Skipping virtualenv creation, as specified in config file." pytest-coverage.txt; then  sed -i "1d" pytest-coverage.txt; fi
         env:
           DJANGO_SETTINGS_MODULE: core.settings
           DEPLOY_ENV: test
