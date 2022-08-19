@@ -23,6 +23,7 @@ django-positions = "^0.6.0"
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
 pytest-cov = "^3.0.0"
+pytest-django = "^4.5.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
