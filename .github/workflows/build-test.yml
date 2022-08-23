@@ -56,6 +56,7 @@ jobs:
           DEPLOY_ENV: test
           SECRET_KEY: test-key
           EMAIL_URL: console://
+          DATABASE_URL: sqlite://local.db
 
       - name: Write Coverage Report Comment
         id: coverage_comment
