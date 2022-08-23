@@ -49,18 +49,21 @@ jobs:
 
       - name: Build Coverage File
         run: |
-          poetry run pytest src | tee pytest-coverage.txt
+          poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=checklists checklists | tee pytest-coverage.txt
+          if grep -q "Skipping virtualenv creation, as specified in config file." pytest-coverage.txt; then  sed -i "1d" pytest-coverage.txt; fi
         env:
           DJANGO_SETTINGS_MODULE: core.settings
           DEPLOY_ENV: test
           SECRET_KEY: test-key
           EMAIL_URL: console://
+          DATABASE_URL: sqlite://local.db
 
       - name: Write Coverage Report Comment
         id: coverage_comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest.xml
 
       # - name: Create the Badge
       #   uses: schneegans/dynamic-badges-action@v1.0.0
