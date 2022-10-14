@@ -66,6 +66,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "users.context_processors.get_profile",
                 "core.context_processors.get_title",
+                "core.context_processors.get_menu_url"                
             ]
         },
     }
