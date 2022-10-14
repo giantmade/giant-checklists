@@ -28,38 +28,64 @@
 
 <body>
 
-    <!-- Top nav -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="{% url "checklists:index" %}"><i class="bi bi-clipboard-check text-white"></i> Checklist Manager</a>
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item"><a class="nav-link" href="{% url "checklists:index" %}">Checklists</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url "templates:index" %}">Templates</a></li>
-        </ul>
-    </div>
-    </nav>
-    
-    <!-- Main body -->
-    <div class="container-fluid pl-0 pr-0">
-        {% block header %}
-        {% endblock %}
+    <div class="row">
+        <div id="mainmenu" class="d-none pr-0 mr-0"></div>
 
-        <ol class="breadcrumb mb-0">
-        {% block breadcrumb %}
-        {% endblock breadcrumb %}
-        </ol>
+        <div id="maincontent" class="col-12">
 
-        {% block body %}
-        {% endblock body %}
-    </div>
+            <!-- Top nav -->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                <a class="navbar-brand" href="{% url "checklists:index" %}"><i class="bi bi-clipboard-check text-white"></i> Checklist Manager</a>
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url "checklists:index" %}">Checklists</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url "templates:index" %}">Templates</a></li>
+                </ul>
+            </div>
+            </nav>
+            
+            <!-- Main body -->
+            <div class="container-fluid pl-0 pr-0">
+                {% block header %}
+                {% endblock %}
 
-    <div class="container-fluid border-top justify-content-center pt-3">
-        {% if request.user.is_authenticated %}
-        <p class="text-center text-light">
-            <a class="text-secondary" href="{% url "self" %}">Settings</a> | <a class="text-secondary" href="/logout/">Log out</a>
-        </p>
-        {% endif %}
+                <ol class="breadcrumb mb-0">
+                {% block breadcrumb %}
+                {% endblock breadcrumb %}
+                </ol>
+
+                {% block body %}
+                {% endblock body %}
+            </div>
+
+            <div class="container-fluid border-top justify-content-center pt-3">
+                {% if request.user.is_authenticated %}
+                <p class="text-center text-light">
+                    <a class="text-secondary" href="{% url "self" %}">Settings</a> | <a class="text-secondary" href="/logout/">Log out</a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </body>
 
 {% block extra_js %}{% endblock %}
+<script>
+    $(document).ready(function () {
+
+        $('#mainmenu').load('{{ menu_url }}', function() {
+            $('#mainmenutoggle').click(function () {
+                if ($('#mainmenu').is(":visible")) {
+                    $('#mainmenu').hide();
+                    $('#mainmenu').removeClass('col-2');
+                    $('#maincontent').removeClass('col-10');
+                    $('#maincontent').addClass('col-12');
+                    $('#maincontent').removeClass('pl-0');
+                } else {
+                    $('#mainmenu').removeClass('d-none').addClass('col-2').show();
+                    $('#maincontent').removeClass('col-12').addClass('col-10 pl-0');
+                }
+            });    
+        });
+    });
+</script>
 </html>
