@@ -116,3 +116,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 SITE_TITLE = env("SITE_TITLE")
 MENU_URL = env("MENU_URL")
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+  'https://login.giantmade.net',
+)
