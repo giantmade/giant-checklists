@@ -35,7 +35,11 @@
 
             <!-- Top nav -->
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <a class="navbar-brand" href="{% url "checklists:index" %}"><i class="bi bi-clipboard-check text-white"></i> Checklist Manager</a>
+                <div>
+                    <a class="navbar-brand" href="#"><i id="mainmenutoggle" class="bi bi-list text-white"></i></a> 
+                    <a class="navbar-brand" href="{% url "wiki" %}"> Checklists</a>
+                </div>
+
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item"><a class="nav-link" href="{% url "checklists:index" %}">Checklists</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url "templates:index" %}">Templates</a></li>
