@@ -66,6 +66,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "users.context_processors.get_profile",
                 "core.context_processors.get_title",
+                "core.context_processors.get_menu_url"                
             ]
         },
     }
@@ -115,3 +116,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 SITE_TITLE = env("SITE_TITLE")
 MENU_URL = env("MENU_URL")
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+  'https://login.giantmade.net',
+)
