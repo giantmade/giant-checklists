@@ -3,9 +3,9 @@ name: Lint & Autolint
 
 on:
   pull_request:
-    branches: 
-     - main
-     - develop
+    branches:
+      - main
+      - develop
 
 jobs:
   lint-and-autolint:
@@ -44,7 +44,7 @@ jobs:
       - name: Run Flake8
         uses: julianwachholz/flake8-action@v2
         with:
-          path: ./src
+          path: .
           plugins: flake8-quotes
           config: setup.cfg
           isTest: true

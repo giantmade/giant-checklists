@@ -17,15 +17,21 @@ else:
 if env("CAS_ENABLED"):
     urlpatterns = [
         # CAS authentication views.
-        path('login/', django_cas_ng.views.LoginView.as_view(), name='login'),
-        path('logout/', django_cas_ng.views.LogoutView.as_view(), name='logout'),
-        path('callback/', django_cas_ng.views.CallbackView.as_view(), name='callback'),
+        path("login/", django_cas_ng.views.LoginView.as_view(), name="login"),
+        path("logout/", django_cas_ng.views.LogoutView.as_view(), name="logout"),
+        path("callback/", django_cas_ng.views.CallbackView.as_view(), name="callback"),
     ]
 else:
     urlpatterns = [
         # Local authentication views.
-        path("login/", auth_views.LoginView.as_view(template_name="users/login.html"), name="login"),
-        path("logout/", auth_views.LogoutView.as_view(template_name="users/logout.html"), name="logout"),
+        path(
+            "login/", auth_views.LoginView.as_view(template_name="users/login.html"), name="login"
+        ),
+        path(
+            "logout/",
+            auth_views.LogoutView.as_view(template_name="users/logout.html"),
+            name="logout",
+        ),
     ]
 
 # fmt: off
