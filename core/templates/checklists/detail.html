@@ -21,7 +21,11 @@
                 {% for item in checklist.items %}
                     <tr>
                         <td class="align-middle">
-                            {{ item.description }}
+                            {% if item.completed %}
+                                <del>{{ item.description }}</del>
+                            {% else %}
+                                {{ item.description }}
+                            {% endif %}
                         </td>
                         <td class="text-right">
                             {% if item.completed %}
