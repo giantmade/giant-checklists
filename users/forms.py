@@ -10,4 +10,4 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = models.Profile
-        fields = ('dark_mode',)
+        fields = ("dark_mode",)

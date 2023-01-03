@@ -26,14 +26,18 @@ def profile(request, username):
     profile = models.Profile.objects.get(user=request.user)
 
     if request.method == "POST":
-       profile_form = forms.ProfileForm(request.POST, instance=profile)
-       if profile_form.is_valid():
-           profile_form.save() 
+        profile_form = forms.ProfileForm(request.POST, instance=profile)
+        if profile_form.is_valid():
+            profile_form.save()
     else:
-        profile_form = forms.ProfileForm(instance=profile)    
+        profile_form = forms.ProfileForm(instance=profile)
 
-    return render(request, "users/profile.html", {
-        'user': user,
-        'profile': profile,
-        'form': profile_form,
-    })
+    return render(
+        request,
+        "users/profile.html",
+        {
+            "user": user,
+            "profile": profile,
+            "form": profile_form,
+        },
+    )
