@@ -10,10 +10,10 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ["*"]),
     CSRF_TRUSTED_ORIGINS=(list, []),
     CAS_ENABLED=(bool, False),
-    CAS_SERVER_URL=(str, 'https://cas.example.com'),
-    CAS_VERSION=(str, '3'),
-    SITE_TITLE=(str, 'Checklists'),
-    MENU_URL=(str, 'https://login.giantmade.net/menu/'),
+    CAS_SERVER_URL=(str, "https://cas.example.com"),
+    CAS_VERSION=(str, "3"),
+    SITE_TITLE=(str, "Checklists"),
+    MENU_URL=(str, "https://login.giantmade.net/menu/"),
 )
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +66,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "users.context_processors.get_profile",
                 "core.context_processors.get_title",
-                "core.context_processors.get_menu_url"                
+                "core.context_processors.get_menu_url",
             ]
         },
     }
@@ -85,9 +85,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-AUTHENTICATION_BACKENDS = (
-    "django.contrib.auth.backends.ModelBackend",
-)
+AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 
 
 # Enable CAS for authentication if configured.
@@ -96,7 +94,9 @@ if env("CAS_ENABLED"):
     CAS_SERVER_URL = env("CAS_SERVER_URL")
     CAS_VERSION = env("CAS_VERSION")
     INSTALLED_APPS += ("django_cas_ng",)
-    MIDDLEWARE += ["django_cas_ng.middleware.CASMiddleware",]
+    MIDDLEWARE += [
+        "django_cas_ng.middleware.CASMiddleware",
+    ]
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -118,6 +118,4 @@ SITE_TITLE = env("SITE_TITLE")
 MENU_URL = env("MENU_URL")
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-  'https://login.giantmade.net',
-)
+CORS_ORIGIN_WHITELIST = ("https://login.giantmade.net",)

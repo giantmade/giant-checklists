@@ -35,13 +35,13 @@ class TemplateItem(models.Model):
 
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     description = models.TextField(max_length=255)
-    position = PositionField(collection='template')
+    position = PositionField(collection="template")
     is_active = models.BooleanField(default=True)
 
     objects = PositionManager()
 
     class Meta:
-        ordering = ['position']
+        ordering = ["position"]
 
     def __str__(self):
         return self.description
@@ -51,7 +51,11 @@ class TemplateItem(models.Model):
         This gets the next item in the Template relative to this current item's `position` field.
         """
 
-        items = list(TemplateItem.objects.filter(template=self.template, is_active=True).order_by('position'))
+        items = list(
+            TemplateItem.objects.filter(template=self.template, is_active=True).order_by(
+                "position"
+            )
+        )
 
         try:
             return items[items.index(self) + 1]
@@ -66,7 +70,11 @@ class TemplateItem(models.Model):
         This gets the previous item in the Template relative to this current item's `position` field.
         """
 
-        items = list(TemplateItem.objects.filter(template=self.template, is_active=True).order_by('position'))
+        items = list(
+            TemplateItem.objects.filter(template=self.template, is_active=True).order_by(
+                "position"
+            )
+        )
 
         return items[items.index(self) - 1]
 
@@ -75,7 +83,7 @@ class TemplateItem(models.Model):
         Returns the comments for this item.
         """
 
-        return TemplateItemComment.objects.filter(item=self).order_by('created_on')
+        return TemplateItemComment.objects.filter(item=self).order_by("created_on")
 
     def comment_count(self):
         """

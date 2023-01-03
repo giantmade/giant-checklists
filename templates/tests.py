@@ -10,26 +10,21 @@ class ChecklistTestCase(TestCase):
     """
 
     def setUp(self):
-        self.checklist1 = models.Checklist(
-            title="Website Golive"
-        )
+        self.checklist1 = models.Checklist(title="Website Golive")
         self.checklist1.save()
 
         self.checklistitem1 = models.ChecklistItem(
-            checklist=self.checklist1,
-            description="Check the server is running."
+            checklist=self.checklist1, description="Check the server is running."
         )
         self.checklistitem1.save()
 
         self.checklistitem2 = models.ChecklistItem(
-            checklist=self.checklist1,
-            description="Upload the code."
+            checklist=self.checklist1, description="Upload the code."
         )
         self.checklistitem2.save()
 
         self.checklistitem3 = models.ChecklistItem(
-            checklist=self.checklist1,
-            description="Test in the browser."
+            checklist=self.checklist1, description="Test in the browser."
         )
         self.checklistitem3.save()
 
@@ -43,15 +38,15 @@ class ChecklistTestCase(TestCase):
 
         self.assertQuerysetEqual(
             qs=models.ChecklistInstance.objects.all(),
-            values=['<ChecklistInstance: Website Golive>']
+            values=["<ChecklistInstance: Website Golive>"],
         )
 
         self.assertQuerysetEqual(
             qs=models.ChecklistItemInstance.objects.all(),
             ordered=False,
             values=[
-                '<ChecklistItemInstance: Check the server is running.>',
-                '<ChecklistItemInstance: Upload the code.>',
-                '<ChecklistItemInstance: Test in the browser.>'
-            ]
+                "<ChecklistItemInstance: Check the server is running.>",
+                "<ChecklistItemInstance: Upload the code.>",
+                "<ChecklistItemInstance: Test in the browser.>",
+            ],
         )

@@ -16,7 +16,7 @@ def index(request):
 
     templates = models.Template.objects.filter(is_active=True)
 
-    return render(request, "templates/index.html", {'templates': templates})
+    return render(request, "templates/index.html", {"templates": templates})
 
 
 @never_cache
@@ -33,29 +33,23 @@ def create(request):
         if form.is_valid():
 
             # First, create the checklist.
-            template = models.Template(
-                title=form.cleaned_data['title'],
-                author=request.user
-            )
+            template = models.Template(title=form.cleaned_data["title"], author=request.user)
             template.save()
 
             # Split any of the form.initial_items data into separate items and save these.
-            for description in form.cleaned_data['initial_items'].splitlines():
-                checklist_item = models.TemplateItem(
-                    template=template,
-                    description=description
-                )
+            for description in form.cleaned_data["initial_items"].splitlines():
+                checklist_item = models.TemplateItem(template=template, description=description)
                 checklist_item.save()
 
             # If the user has opted to immediately edit, then take them there
-            if form.cleaned_data['edit_immediately']:
+            if form.cleaned_data["edit_immediately"]:
                 return redirect("templates:detail", template_id=template.id)
 
             return redirect("templates:index")
     else:
         form = forms.TemplateForm()
 
-    return render(request, "templates/create.html", {'form': form})
+    return render(request, "templates/create.html", {"form": form})
 
 
 @never_cache
@@ -67,7 +61,7 @@ def detail(request, template_id):
 
     template = get_object_or_404(models.Template, id=template_id)
 
-    return render(request, "templates/detail.html", {'template': template})
+    return render(request, "templates/detail.html", {"template": template})
 
 
 @never_cache
@@ -80,7 +74,7 @@ def edit(request, template_id):
 
     template = get_object_or_404(models.Template, id=template_id)
 
-    template.title = request.POST['title']
+    template.title = request.POST["title"]
     template.save()
 
     return redirect("templates:index")
@@ -96,7 +90,7 @@ def description(request, template_id):
 
     template = get_object_or_404(models.Template, id=template_id)
 
-    template.description = request.POST['description']
+    template.description = request.POST["description"]
     template.save()
 
     return redirect("templates:detail", template_id=template.id)
@@ -137,7 +131,7 @@ def item_create(request, template_id):
         # Create the new template item.
         template_item = models.TemplateItem(
             template=template,
-            description=form.cleaned_data['description'],
+            description=form.cleaned_data["description"],
         )
 
         # Save the new item.
@@ -196,7 +190,7 @@ def item_swap(request, template_id, source_id, destination_id):
     destination.save()
 
     # Reposition the list.
-    models.TemplateItem.objects.filter(template=template).order_by('position').reposition()
+    models.TemplateItem.objects.filter(template=template).order_by("position").reposition()
 
     # Return to the template detail page.
     return redirect("templates:detail", template_id=template.id)
@@ -215,7 +209,7 @@ def item_edit(request, template_id, item_id):
     item = get_object_or_404(models.TemplateItem, template=template, id=item_id)
 
     # Save the new value.
-    item.description = request.POST['description']
+    item.description = request.POST["description"]
     item.save()
 
     # Return to the template detail page.

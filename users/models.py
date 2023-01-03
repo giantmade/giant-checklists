@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import validate_email
 
+
 class Profile(models.Model):
     """
     This is a user profile.
