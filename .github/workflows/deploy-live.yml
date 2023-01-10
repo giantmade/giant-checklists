@@ -8,22 +8,4 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cloning repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      
-      - name: Push to dokku
-        id: dokku_push
-        uses: dokku/github-action@master
-        with:
-          # specify the current branch as the remote branch to push to
-          branch: ${{ github.head_ref }}
-          ssh_host_key: ${{ secrets.SSH_LIVE_HOST_KEY }}
-          git_push_flags: '-vvv'
-          git_remote_url: 'ssh://dokku@internal.giantmade.net:22/live-checklists'
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+    uses: giantmade/github-actions/.github/workflows/deploy-live.yml@main
