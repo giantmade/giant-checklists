@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "giant-wiki"
+name = "giant-checklists"
 version = "0.1.0"
 description = ""
 authors = ["Jon Atkinson <jon.atkinson@giantmade.com>"]
