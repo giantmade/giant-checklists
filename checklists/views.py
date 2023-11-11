@@ -186,7 +186,7 @@ def complete_toggle(request, checklist_id):
 @never_cache
 @login_required
 @require_POST
-def item_complete_toggle(request, checklist_id, item_id):
+def item_boolean_field_toggle(request, checklist_id, item_id, field):
     """
     This toggles the completed status of a given item.
     """
@@ -194,7 +194,7 @@ def item_complete_toggle(request, checklist_id, item_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
     item = get_object_or_404(models.ChecklistItem, checklist=checklist, id=item_id)
 
-    if item.completed:
+    if field == "complete" and item.completed:
         item.completed = False
 
         # Create an event.
@@ -204,14 +204,35 @@ def item_complete_toggle(request, checklist_id, item_id):
             message="Marked the item '%s' as incomplete." % item.description,
         )
         event.save()
-    else:
+    elif field == "complete" and not item.completed:
         item.completed = True
+        item.is_not_applicable = False
 
         # Create an event.
         event = models.ChecklistEvent(
             checklist=checklist,
             author=request.user,
             message="Marked the item '%s' as complete." % item.description,
+        )
+        event.save()
+    elif field == "applicable" and item.is_not_applicable:
+        item.is_not_applicable = False
+
+        # Create an event.
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Marked the item '%s' as applicable." % item.description,
+        )
+        event.save()
+    else:
+        item.is_not_applicable = True
+        item.complete = False
+
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Marked the item '%s' as not applicable." % item.description,
         )
         event.save()
 

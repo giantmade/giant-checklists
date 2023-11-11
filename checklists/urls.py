@@ -17,9 +17,9 @@ urlpatterns = [
     url(r"^(?P<checklist_id>\d+)/delete/$", views.delete, name="delete"),
     # ChecklistItem views.
     url(
-        r"^(?P<checklist_id>\d+)/items/(?P<item_id>\d+)/complete_toggle/$",
-        views.item_complete_toggle,
-        name="item_complete_toggle",
+        r"^(?P<checklist_id>\d+)/items/(?P<item_id>\d+)/complete_toggle/(?P<field>\w+)/$",
+        views.item_boolean_field_toggle,
+        name="item_boolean_field_toggle",
     ),
     url(
         r"^(?P<checklist_id>\d+)/items/(?P<item_id>\d+)/comment/$",
