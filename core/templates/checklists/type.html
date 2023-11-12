@@ -2,10 +2,14 @@
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url "checklists:index" %}">Checklists</a></li>
-    <li class="breadcrumb-item active"><a href="{% url "checklists:complete" %}">Completed</a></li>
+    {% if type == "complete" %}
+        <li class="breadcrumb-item active"><a href="{% url "checklists:type" "complete" %}">Completed</a></li>
+    {% elif type == "archive" %}
+        <li class="breadcrumb-item active"><a href="{% url "checklists:type" "archive" %}">Archived</a></li>
+    {% endif %}
 {% endblock %}
 
-{% block title %}Completed Checklists{% endblock %}
+{% block title %}{% if type == "complete" %}Completed{% else %}Archived{% endif %} Checklists{% endblock %}
 
 {% block body %}
 

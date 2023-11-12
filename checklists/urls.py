@@ -7,12 +7,12 @@ app_name = "checklists"
 urlpatterns = [
     # Checklist views.
     url(r"^$", views.index, name="index"),
-    url(r"^complete/$", views.complete, name="complete"),
+    url(r"^type/(?P<checklist_type>\w+)/$", views.type, name="type"),
     url(r"^create/$", views.create, name="create"),
     url(r"^(?P<checklist_id>\d+)/$", views.detail, name="detail"),
     url(r"^(?P<checklist_id>\d+)/edit_notes/$", views.edit_notes, name="edit_notes"),
     url(
-        r"^(?P<checklist_id>\d+)/complete_toggle/$", views.complete_toggle, name="complete_toggle"
+        r"^(?P<checklist_id>\d+)/checklist_toggle/(?P<checklist_type>\w+)$", views.checklist_toggle, name="checklist_toggle"
     ),
     url(r"^(?P<checklist_id>\d+)/delete/$", views.delete, name="delete"),
     # ChecklistItem views.

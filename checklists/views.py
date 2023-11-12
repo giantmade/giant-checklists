@@ -13,7 +13,7 @@ def index(request):
     This is the index view for checklists.
     """
 
-    checklists = models.Checklist.objects.filter(completed=False)
+    checklists = models.Checklist.objects.filter(completed=False, archived=False)
 
     return render(
         request,
@@ -26,18 +26,20 @@ def index(request):
 
 @never_cache
 @login_required
-def complete(request):
+def type(request, checklist_type):
     """
     This is the index view for completed checklists.
     """
 
-    checklists = models.Checklist.objects.filter(completed=True)
+    checklists = (models.Checklist.objects.filter(completed=True) if checklist_type == "complete"
+                  else models.Checklist.objects.filter(archived=True))
 
     return render(
         request,
-        "checklists/complete.html",
+        "checklists/type.html",
         {
             "checklists": checklists,
+            "type": checklist_type,
         },
     )
 
@@ -147,7 +149,7 @@ def edit_notes(request, checklist_id):
 @never_cache
 @login_required
 @require_POST
-def complete_toggle(request, checklist_id):
+def checklist_toggle(request, checklist_id, checklist_type):
     """
     This toggles the 'completed' status of a given checklist.
     """
@@ -155,7 +157,7 @@ def complete_toggle(request, checklist_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
     # Mark as incomplete, return to detail page.
-    if checklist.completed:
+    if checklist_type == "complete" and checklist.completed:
         checklist.completed = False
         checklist.save()
 
@@ -168,7 +170,7 @@ def complete_toggle(request, checklist_id):
         event.save()
 
     # Mark as complete, return to index page.
-    else:
+    elif checklist_type == "complete" and not checklist.completed:
         checklist.completed = True
         checklist.save()
 
@@ -179,7 +181,28 @@ def complete_toggle(request, checklist_id):
             message="Marked the checklist as complete.",
         )
         event.save()
+    elif checklist_type == "archive" and checklist.archived:
+        checklist.archived = False
+        checklist.save()
 
+        # Create an event.
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Removed the checklist from the archive.",
+        )
+        event.save()
+    else:
+        checklist.archived = True
+        checklist.save()
+
+        # Create an event.
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Added the checklist to the archive.",
+        )
+        event.save()
     return redirect("checklists:detail", checklist_id=checklist.id)
 
 

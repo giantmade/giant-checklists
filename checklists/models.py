@@ -16,6 +16,7 @@ class Checklist(models.Model):
     notes = models.TextField(blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # TODO: for future use, I want to hold a list of users here to be notified when the list is completed.

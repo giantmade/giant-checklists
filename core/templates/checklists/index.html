@@ -36,7 +36,8 @@
         <div class="col-md-4 border-left pt-2 pb-2">
             <p>This is the list of currently active checklists.</p>
             <p><a class="btn btn-primary" href="{% url "checklists:create" %}">Create checklist</a></p>
-            <p><a class="btn btn-primary" href="{% url "checklists:complete" %}">Show completed</a></p>
+            <p><a class="btn btn-primary" href="{% url "checklists:type" "complete" %}">Show completed</a></p>
+            <p><a class="btn btn-primary" href="{% url "checklists:type" "archive" %}">Show archived</a></p>
         </div>
     </div>
 {% endblock %}
