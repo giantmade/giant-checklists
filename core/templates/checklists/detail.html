@@ -68,7 +68,7 @@
 
             {% ifequal checklist.progress 100 %}
                 <!-- Complete checklist toggle -->
-                <form class="mt-3" method="post" action="{% url "checklists:complete_toggle" checklist.id %}">
+                <form class="mt-3" method="post" action="{% url "checklists:checklist_toggle" checklist.id "complete" %}">
                     {% csrf_token %}
                     {% if checklist.completed %}
                         <button type="submit" class="btn btn-danger">Not Complete!</button>
@@ -77,6 +77,16 @@
                     {% endif %}
                 </form>
             {% endifequal %}
+
+            <!-- Archive checklist toggle -->
+            <form class="mt-3" method="post" action="{% url "checklists:checklist_toggle" checklist.id "archive" %}">
+                {% csrf_token %}
+                {% if checklist.archived %}
+                    <button type="submit" class="btn btn-danger">Remove from Archive</button>
+                {% else %}
+                    <button type="submit" class="btn btn-success btn-default" >Archive Checklist</button>
+                {% endif %}
+            </form>
 
             <p class="mt-3"><a class="btn btn-danger" href="{% url "checklists:delete" checklist.id %}">Delete Checklist</a></p>
 
