@@ -26,4 +26,5 @@ urlpatterns = [
         views.item_comment,
         name="item_comment",
     ),
+    url(r"^append-checklist-item/(?P<checklist_id>\d+)/$", views.append_item, name="append_item"),
 ]
