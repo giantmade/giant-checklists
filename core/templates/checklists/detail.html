@@ -35,18 +35,29 @@
                                 </button>
                             {% else %}
                                 <!-- Mark complete -->
-                                <button type="button" class="btn btn-success m-r-10" data-toggle="modal" data-target="#item-complete-toggle-{{ item.id }}">
+                                <button type="button" class="btn btn-success m-r-10" data-toggle="modal" data-target="#item-complete-toggle-{{ item.id }}" {% if item.is_not_applicable %}disabled{% endif %}>
                                     <i class="bi bi-check"></i> Complete
                                 </button>
                             {% endif %}
                             <!-- Comment -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#item-comment-{{ item.id }}">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#item-comment-{{ item.id }}" {% if item.is_not_applicable %}disabled{% endif %}>
                             <i class="bi bi-chat-square-text"></i> Comment
                                 {% if item.comments %}
                                     <span class="badge">{{ item.comment_count }}</span>
                                 {% endif %}
                             </span>
                             </button>
+                            {% if item.is_not_applicable %}
+                                <!-- Mark not applicable  -->
+                                <button type="button" class="btn btn-primary m-r-10" data-toggle="modal" data-target="#item-applicable-toggle-{{ item.id }}">
+                                    <i class="bi bi-x"></i> Is Applicable
+                                </button>
+                            {% else %}
+                                <!-- Mark complete -->
+                                <button type="button" class="btn btn-success m-r-10" data-toggle="modal" data-target="#item-applicable-toggle-{{ item.id }}">
+                                    <i class="bi bi-check"></i> Not Applicable
+                                </button>
+                            {% endif %}
                         </td>
 
                     </tr>
@@ -131,6 +142,10 @@
     <!-- Item comment modals. -->
     {% for item in checklist.items %}
         {% include "checklists/partials/_checklistitem_comment_modal.html" %}
+    {% endfor %}
+
+    {% for item in checklist.items %}
+        {% include "checklists/partials/_checklistitem_applicable.html" %}
     {% endfor %}
 
     <!-- Edit notes modal. -->

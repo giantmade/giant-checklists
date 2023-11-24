@@ -17,7 +17,7 @@
 
             </div>
             <div class="modal-footer">
-                <form method="post" action="{% url "checklists:item_complete_toggle" checklist.id item.id %}">
+                <form method="post" action="{% url "checklists:item_boolean_field_toggle" checklist.id item.id 'complete' %}">
                     {% csrf_token %}
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     {% if item.completed %}

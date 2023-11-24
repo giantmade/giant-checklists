@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from positions import PositionField, PositionManager
@@ -59,6 +60,8 @@ class ChecklistItem(models.Model):
     completed = models.BooleanField(default=False)
     completed_on = models.DateTimeField(blank=True, null=True)
 
+    is_not_applicable = models.BooleanField(help_text="Not Applicable", default=False)
+
     objects = PositionManager()
 
     def comments(self):
@@ -78,6 +81,10 @@ class ChecklistItem(models.Model):
 
     def __str__(self):
         return self.description
+
+    def clean(self):
+        if self.is_not_applicable and self.completed:
+            raise ValidationError("A checklist item cannot be both complete and not applicable.")
 
 
 class ChecklistEvent(models.Model):

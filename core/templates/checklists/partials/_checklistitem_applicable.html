@@ -1,0 +1,32 @@
+<div class="modal fade" id="item-applicable-toggle-{{ item.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if item.is_not_applicable %}
+                    <h4 class="modal-title">Item Applicable</h4>
+                {% else %}
+                    <h4 class="modal-title">Item Not Applicable</h4>
+                {% endif %}
+            </div>
+            <div class="modal-body">
+                {% if item.is_not_applicable %}
+                    <p>Set the item "{{ item.description }}" applicable?</p>
+                {% else %}
+                    <p>Is the item "{{ item.description }}" not applicable?</p>
+                {% endif %}
+
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="{% url "checklists:item_boolean_field_toggle" checklist.id item.id 'applicable' %}">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    {% if item.is_not_applicable %}
+                        <button type="submit" class="btn btn-danger">Applicable</input>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">Not Applicable</input>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
