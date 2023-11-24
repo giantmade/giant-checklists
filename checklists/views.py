@@ -4,6 +4,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from . import forms, models
+from checklists.models import ChecklistItem
 
 
 @never_cache
@@ -242,3 +243,21 @@ def item_comment(request, checklist_id, item_id):
 
     # Return to the template detail page.
     return redirect("checklists:detail", checklist_id=checklist.id)
+
+
+@never_cache
+@login_required
+def append_item(request, checklist_id):
+    """
+    This handles a checklist item being added post checklist creation.
+    """
+
+    checklist = get_object_or_404(models.Checklist, id=checklist_id)
+
+    if request.method == "POST" :
+        ChecklistItem.objects.create(
+            checklist=checklist,
+            description=request.POST.get("item_description"),
+        )
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))

@@ -53,6 +53,11 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <form action="{% url 'checklists:append_item' checklist.id %}" method="POST">
+                {% csrf_token %}
+                <input type="text" name="item_description" placeholder="Checklist item text" required/>
+                <button type="submit" class="btn" >Add checklist item</button>
+            </form>
         </div>
 
         <div class="col-md-4 border-left pt-3 pr-3">
