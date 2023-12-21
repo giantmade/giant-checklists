@@ -30,7 +30,7 @@ class Template(models.Model):
 
 class TemplateItem(models.Model):
     """
-    This is a checklist item.
+    This is a checis_klist item.
     """
 
     template = models.ForeignKey(Template, on_delete=models.CASCADE)

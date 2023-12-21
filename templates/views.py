@@ -27,6 +27,7 @@ def create(request):
     """
 
     if request.method == "POST":
+        print(f"http referer: {request.META.get('HTTP_REFERER')}")
         form = forms.TemplateForm(request.POST)
 
         # If the form is valid, then we'll create the Checklist.

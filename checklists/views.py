@@ -62,14 +62,15 @@ def create(request):
             checklist.save()
 
             # Add the child items.
-            for item in checklist.template.items().order_by("position"):
-                checklist_item = models.ChecklistItem(
-                    checklist=checklist,
-                    original_item=item,
-                    description=item.description,
-                    position=item.position,
-                )
-                checklist_item.save()
+            if checklist.template:
+                for item in checklist.template.items().order_by("position"):
+                    checklist_item = models.ChecklistItem(
+                        checklist=checklist,
+                        original_item=item,
+                        description=item.description,
+                        position=item.position,
+                    )
+                    checklist_item.save()
 
             # Create an event.
             event = models.ChecklistEvent(
@@ -111,6 +112,7 @@ def detail(request, checklist_id):
             "checklist": checklist,
             "events": events,
             "all_events": all_events,
+            "create_template": True if not checklist.template else False,
         },
     )
 

@@ -12,7 +12,7 @@ class Checklist(models.Model):
     This is an instance of a checklist.
     """
 
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=255)
     notes = models.TextField(blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -35,7 +35,7 @@ class Checklist(models.Model):
         This calculates the percentage progress through the list.
         """
 
-        total_items = float(len(self.items()))
+        total_items = float(len(self.items())) or 1
         completed_items = float(len(self.items().filter(completed=True)))
 
         return int(round((completed_items / total_items) * 100))
@@ -49,7 +49,7 @@ class ChecklistItem(models.Model):
     This is an instance of a checklist item.
     """
 
-    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE)
+    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE, related_name="items")
     original_item = models.ForeignKey(
         TemplateItem, blank=True, null=True, on_delete=models.CASCADE
     )

@@ -148,6 +148,14 @@
         {% include "checklists/partials/_checklistitem_applicable.html" %}
     {% endfor %}
 
+    {% if create_template %}
+        <p>You made a new checklist, do you want to add this to the list of available templates?</p>
+        <form method="POST" action="{% url 'templates:create' %}">
+
+            <button>Create Template</button>
+        </form>
+    {% endif %}
+
     <!-- Edit notes modal. -->
     {% include "checklists/partials/_checklist_notes_edit.html" %}
 
