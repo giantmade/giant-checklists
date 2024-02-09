@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from . import models
@@ -36,7 +36,7 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_valid_user_created(self):
-        response = self.client.post(
+        self.client.post(
             reverse("register"),
             {
                 "username": "foobar1",
@@ -52,7 +52,7 @@ class RegistrationTestCase(TestCase):
         self.assertNotEqual(u, None)
 
     def test_duplicated_username_error(self):
-        response = self.client.post(
+        self.client.post(
             reverse("register"),
             {
                 "username": "foobar1",

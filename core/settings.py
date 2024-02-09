@@ -1,8 +1,7 @@
 import os
-import environ
-import dj_database_url
 
-from loguru import logger
+import dj_database_url
+import environ
 
 env = environ.Env(
     # Set cast type, and default values

@@ -1,7 +1,6 @@
-from django.db import models
-
 # from instances.models import Checklist, ChecklistItem
 from django.contrib.auth.models import User
+from django.db import models
 
 from positions.fields import PositionField
 from positions.managers import PositionManager
@@ -30,7 +29,7 @@ class Template(models.Model):
 
 class TemplateItem(models.Model):
     """
-    This is a checklist item.
+    This is a checis_klist item.
     """
 
     template = models.ForeignKey(Template, on_delete=models.CASCADE)

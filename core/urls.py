@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path, reverse
+from django.urls import include, path
 from django.views.generic.base import RedirectView
 
-from users import views as users_views
-
 from core.settings import env
+from users import views as users_views
 
 if env("CAS_ENABLED"):
     import django_cas_ng.views
