@@ -11,7 +11,9 @@ class ChecklistForm(forms.ModelForm):
     """
 
     template = forms.ModelChoiceField(
-        queryset=Template.objects.filter(is_active=True), empty_label="Create without template.", required=False,
+        queryset=Template.objects.filter(is_active=True),
+        empty_label="Create without template.",
+        required=False,
     )
     notes = forms.CharField(widget=forms.Textarea(), required=False)
 

@@ -1,7 +1,6 @@
-from django.db import models
-
 # from instances.models import Checklist, ChecklistItem
 from django.contrib.auth.models import User
+from django.db import models
 
 from positions.fields import PositionField
 from positions.managers import PositionManager

@@ -10,6 +10,7 @@
 {% block body %}
     <div class="row">
         <div class="col-md-8">
+        {% if checklist.checklist_items.all %}
             <table class="table table-borderless table-striped">
                 <thead>
                 <tr>
@@ -18,7 +19,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in checklist.items %}
+                {% for item in checklist.checklist_items.all %}
                     <tr>
                         <td class="align-middle">
                             {% if item.completed %}
@@ -64,6 +65,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+        {% endif %}
             <form action="{% url 'checklists:append_item' checklist.id %}" method="POST">
                 {% csrf_token %}
                 <input type="text" name="item_description" placeholder="Checklist item text" required/>
@@ -135,23 +137,23 @@
     </div>
 
     <!-- Item complete modals. -->
-    {% for item in checklist.items %}
+    {% for item in checklist.checklist_items.all %}
         {% include "checklists/partials/_checklistitem_complete.html" %}
     {% endfor %}
 
     <!-- Item comment modals. -->
-    {% for item in checklist.items %}
+    {% for item in checklist.checklist_items.all %}
         {% include "checklists/partials/_checklistitem_comment_modal.html" %}
     {% endfor %}
 
-    {% for item in checklist.items %}
+    {% for item in checklist.checklist_items.all %}
         {% include "checklists/partials/_checklistitem_applicable.html" %}
     {% endfor %}
 
     {% if create_template %}
         <p>You made a new checklist, do you want to add this to the list of available templates?</p>
-        <form method="POST" action="{% url 'templates:create' %}">
-
+        <form method="GET" action="{% url 'templates:create_from_checklist' checklist.id %}">
+            {% csrf_token %}
             <button>Create Template</button>
         </form>
     {% endif %}

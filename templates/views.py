@@ -1,10 +1,15 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
-from . import forms
-from . import models
+from loguru import logger
+
+from checklists.models import Checklist
+
+from . import forms, models
+from .models import TemplateItem
 
 
 @never_cache
@@ -21,15 +26,13 @@ def index(request):
 
 @never_cache
 @login_required
-def create(request):
+def create(request, checklist_id=None):
     """
     This is the create view for templates.
     """
 
     if request.method == "POST":
-        print(f"http referer: {request.META.get('HTTP_REFERER')}")
         form = forms.TemplateForm(request.POST)
-
         # If the form is valid, then we'll create the Checklist.
         if form.is_valid():
 
@@ -37,9 +40,23 @@ def create(request):
             template = models.Template(title=form.cleaned_data["title"], author=request.user)
             template.save()
 
+            try:
+                checklist = get_object_or_404(Checklist, id=checklist_id)
+                print("REACHED!")
+                for checklist_item in checklist.checklist_items.all():
+                    print("checklist_item", checklist_item)
+                    template_item = TemplateItem.objects.create(
+                        template=template,
+                        description=checklist_item.description,
+                        position=checklist_item.position,
+                    )
+                logger.info(f"Template created with checklist {checklist.id}")
+            except Http404:
+                logger.info("Template created without checklist.")
+
             # Split any of the form.initial_items data into separate items and save these.
             for description in form.cleaned_data["initial_items"].splitlines():
-                checklist_item = models.TemplateItem(template=template, description=description)
+                checklist_item = TemplateItem(template=template, description=description)
                 checklist_item.save()
 
             # If the user has opted to immediately edit, then take them there
@@ -49,8 +66,15 @@ def create(request):
             return redirect("templates:index")
     else:
         form = forms.TemplateForm()
+        if checklist_id:
+            form = forms.TemplateFromChecklistForm(checklist_id=checklist_id)
 
-    return render(request, "templates/create.html", {"form": form})
+    context = {
+        "form": form,
+        "checklist_id": checklist_id,
+    }
+
+    return render(request, "templates/create.html", context)
 
 
 @never_cache

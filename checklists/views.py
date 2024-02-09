@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
-from . import forms, models
 from checklists.models import ChecklistItem
+
+from . import forms, models
 
 
 @never_cache
@@ -32,8 +33,11 @@ def type(request, checklist_type):
     This is the index view for completed checklists.
     """
 
-    checklists = (models.Checklist.objects.filter(completed=True) if checklist_type == "complete"
-                  else models.Checklist.objects.filter(archived=True))
+    checklists = (
+        models.Checklist.objects.filter(completed=True)
+        if checklist_type == "complete"
+        else models.Checklist.objects.filter(archived=True)
+    )
 
     return render(
         request,
@@ -101,8 +105,11 @@ def detail(request, checklist_id):
 
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
     events = models.ChecklistEvent.objects.filter(checklist=checklist).order_by("-created_on")
+    print("EVENTS: ", events)
+    print("CHECKLIST: ", checklist)
 
-    # Check for the 'all events' flag. If this is false, only show 5 recent events in the event list.
+    # Check for the 'all events' flag. If this is false,
+    # only show 5 recent events in the event list.
     all_events = "all_events" in request.GET
 
     return render(
@@ -300,10 +307,10 @@ def append_item(request, checklist_id):
 
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
-    if request.method == "POST" :
+    if request.method == "POST":
         ChecklistItem.objects.create(
             checklist=checklist,
             description=request.POST.get("item_description"),
         )
 
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect(request.META.get("HTTP_REFERER", "/"))
