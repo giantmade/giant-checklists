@@ -7,12 +7,17 @@
 {% block title %}Checklists{% endblock %}
 
 {% block body %}
+    <form>
+        {{ form }}
+        <button type="submit">Filter checklists</button>
+    </form>
     <div class="row">
         <div class="col-md-8">
             <table class="table table-borderless">
                 <thead>
                 <tr>
                     <th>Title</th>
+                    <th>Category</th>
                     <th>Progress</th>
                 </tr>
                 </thead>
@@ -21,6 +26,9 @@
                     <tr>
                         <td>
                             <a href="{% url "checklists:detail" item.id %}">{{ item.title }}</a>
+                        </td>
+                        <td>
+                            {% if item.category %}{{ item.category }}{% else %}None{% endif %}
                         </td>
                         <td>
                             <div class="progress">
