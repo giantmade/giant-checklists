@@ -37,6 +37,11 @@
                     </div>
 
                     <div class="form-group">
+                        <p><label for="{{ form.category.id_for_label }}">Category</label></p>
+                        {{ form.category }}
+                    </div>
+
+                    <div class="form-group">
                         <p><label for="{{ form.notes.id_for_label }}">Notes</label></p>
                         <p>Add any additional notes about the checklist here. It'll be visible to anyone who views this checklist. eg. <em>"This is the checklist to launch phase 2 of the client's project"</em>.</p>
                         <p><textarea name="notes" class="form-control" rows="10" id="{{ form.notes.id_for_label }}"></textarea></p>

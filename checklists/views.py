@@ -4,7 +4,6 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from . import forms, models
-from checklists.models import ChecklistItem
 
 
 @never_cache
@@ -16,11 +15,17 @@ def index(request):
 
     checklists = models.Checklist.objects.filter(completed=False, archived=False)
 
+    form = forms.ChecklistCategoryFilterForm(request.GET or None)
+
+    if form.is_valid():
+        checklists = form.filter_by_category(checklists)
+
     return render(
         request,
         "checklists/index.html",
         {
             "checklists": checklists,
+            "form": form,
         },
     )
 
@@ -299,7 +304,7 @@ def append_item(request, checklist_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
     if request.method == "POST" :
-        ChecklistItem.objects.create(
+        models.ChecklistItem.objects.create(
             checklist=checklist,
             description=request.POST.get("item_description"),
         )
