@@ -8,6 +8,17 @@ from positions import PositionField, PositionManager
 from templates.models import Template, TemplateItem
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class Checklist(models.Model):
     """
     This is an instance of a checklist.
@@ -28,6 +39,7 @@ class Checklist(models.Model):
         blank=True,
     )
     bulk_mark_completed_at = models.DateTimeField(null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
     # TODO: for future use, I want to hold a list of users here to be notified when the list is completed.
     notification_group = models.ManyToManyField(User, related_name="notification_users")
