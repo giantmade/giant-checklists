@@ -52,10 +52,10 @@ class Checklist(models.Model):
 
         return int(round((completed_items / total_items) * 100))
 
-    def bulk_mark_complete(self, user):
-        self.completed = True
-        self.bulk_mark_completed_by = user
-        self.bulk_mark_completed_at = timezone.now()
+    def bulk_mark(self, user: User, mark_complete: bool):
+        self.completed = mark_complete
+        self.bulk_mark_completed_by = user if mark_complete else None
+        self.bulk_mark_completed_at = timezone.now() if mark_complete else None
         self.save()
 
 

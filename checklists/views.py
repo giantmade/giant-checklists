@@ -317,7 +317,8 @@ def bulk_mark_complete(request, checklist_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
     if request.method == "POST":
-        checklist.bulk_mark_complete(user=request.user)
+        is_mark_complete = True if not checklist.bulk_mark_completed_by else False
+        checklist.bulk_mark(user=request.user, mark_complete=is_mark_complete)
         return redirect("checklists:index")
 
     return render(request, "checklists/mark_as_complete.html", {"checklist": checklist})
