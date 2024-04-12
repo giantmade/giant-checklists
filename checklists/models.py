@@ -7,6 +7,17 @@ from positions import PositionField, PositionManager
 from templates.models import Template, TemplateItem
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class Checklist(models.Model):
     """
     This is an instance of a checklist.
@@ -19,6 +30,7 @@ class Checklist(models.Model):
     completed = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
     # TODO: for future use, I want to hold a list of users here to be
     #  notified when the list is completed.
