@@ -26,10 +26,6 @@ class ChecklistCategoryFilterForm(forms.Form):
         queryset=Category.objects.all(), empty_label="--No category selected--"
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self
-
     def filter_by_category(self, queryset):
         return Checklist.objects.filter(category=self.cleaned_data["category"])
 
