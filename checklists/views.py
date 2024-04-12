@@ -15,10 +15,10 @@ def index(request):
 
     checklists = models.Checklist.objects.filter(completed=False, archived=False)
 
-    form = forms.ChecklistCategoryFilterForm(request.GET or None)
+    form = forms.ChecklistFilterForm(request.GET or None)
 
     if form.is_valid():
-        checklists = form.filter_by_category(checklists)
+        checklists = form.filter_checklists()
 
     return render(
         request,
