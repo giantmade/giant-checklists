@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
@@ -19,6 +21,23 @@ def index(request):
 
     if form.is_valid():
         checklists = form.filter_checklists()
+
+    sort_string = next((key for key in request.GET.keys() if key.startswith('sort-by-')), None)
+    if sort_string:
+        sort_parameter = re.search(r'sort-by-(.*)', sort_string).group(1)
+        sort_parameter = "-" + sort_parameter if request.GET.get(sort_string) == "desc" else sort_parameter
+
+        if "progress" in sort_parameter:
+            """ 
+            'Progress' is a method on model and therefore cannot be sorted as regular queryset
+            so in this case we will sort as a list instead.
+            """
+            progress_list = [(checklist, checklist.progress()) for checklist in checklists]
+            is_descending = True if "-" in sort_parameter else False
+            sorted_progress_list = sorted(progress_list, key=lambda x: x[1], reverse=is_descending)
+            checklists = [item[0] for item in sorted_progress_list]
+        else:
+            checklists = checklists.order_by(sort_parameter)
 
     return render(
         request,
@@ -265,6 +284,7 @@ def item_boolean_field_toggle(request, checklist_id, item_id, field):
         )
         event.save()
 
+    checklist.save()  # to refresh the updated_at date/ time value
     item.save()
 
     return redirect("checklists:detail", checklist_id=checklist.id)
@@ -289,6 +309,7 @@ def item_comment(request, checklist_id, item_id):
         content=request.POST["content"],
     )
     comment.save()
+    checklist.save()  # to refresh the updated_at date/ time value
 
     # Return to the template detail page.
     return redirect("checklists:detail", checklist_id=checklist.id)
@@ -308,5 +329,6 @@ def append_item(request, checklist_id):
             checklist=checklist,
             description=request.POST.get("item_description"),
         )
+        checklist.save()  # to refresh the updated_at date/ time value
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
