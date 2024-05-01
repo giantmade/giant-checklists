@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from positions import PositionField, PositionManager
 
@@ -31,10 +32,21 @@ class Checklist(models.Model):
     completed = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    bulk_mark_completed_by = models.ForeignKey(
+        User,
+        related_name='checklists_bulk_mark_completed',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    bulk_mark_completed_at = models.DateTimeField(null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
     # TODO: for future use, I want to hold a list of users here to be notified when the list is completed.
     notification_group = models.ManyToManyField(User, related_name="notification_users")
+
+    def __str__(self):
+        return self.title
 
     def items(self):
         """
@@ -55,8 +67,11 @@ class Checklist(models.Model):
             return int(round((completed_items / total_items) * 100))
         return 0
 
-    def __str__(self):
-        return self.title
+    def bulk_mark(self, user: User, mark_complete: bool):
+        self.completed = mark_complete
+        self.bulk_mark_completed_by = user if mark_complete else None
+        self.bulk_mark_completed_at = timezone.now() if mark_complete else None
+        self.save()
 
 
 class ChecklistItem(models.Model):

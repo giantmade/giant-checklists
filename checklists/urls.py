@@ -27,4 +27,5 @@ urlpatterns = [
         name="item_comment",
     ),
     url(r"^append-checklist-item/(?P<checklist_id>\d+)/$", views.append_item, name="append_item"),
+    url(r"^bulk-mark-complete/(?P<checklist_id>\d+)/$", views.bulk_mark_complete, name="bulk_mark_complete"),
 ]

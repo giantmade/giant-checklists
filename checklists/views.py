@@ -338,3 +338,20 @@ def append_item(request, checklist_id):
         checklist.save()  # to refresh the updated_at date/ time value
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@never_cache
+@login_required
+def bulk_mark_complete(request, checklist_id):
+    """
+    This deals with bulk marking a checklist as complete.
+    """
+
+    checklist = get_object_or_404(models.Checklist, id=checklist_id)
+
+    if request.method == "POST":
+        is_mark_complete = True if not checklist.bulk_mark_completed_by else False
+        checklist.bulk_mark(user=request.user, mark_complete=is_mark_complete)
+        return redirect("checklists:index")
+
+    return render(request, "checklists/mark_as_complete.html", {"checklist": checklist})

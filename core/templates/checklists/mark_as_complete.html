@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url "checklists:index" %}">Checklists</a></li>
+    <li class="breadcrumb-item"><a href="{% url "checklists:delete" checklist.id %}">{{ checklist.title }}</a></li>
+    <li class="breadcrumb-item active">Delete</li>
+{% endblock %}
+
+{% block title %}{{ checklist.title }}{% endblock %}
+
+{% block body %}
+    {% with is_bulk=checklist.bulk_mark_completed_by %}
+    <div class="row justify-content-md-center">
+        <div class="col-md-4 mt-4 mb-4">
+            <p class="text-center mb-4">Are you sure you want to bulk mark this checklist as {% if is_bulk %}in{% endif %}complete? (The status of each individual checklist item will remain unchanged)</p>
+            <form action="{% url "checklists:bulk_mark_complete" checklist.id %}" method="post" class="mt-4">
+                {% csrf_token %}
+                <p class="text-center mt-4"><input type="submit" class="btn btn-danger" value="Mark as {% if is_bulk %}NOT {% endif %}Complete"></p>
+                <p class="text-center"><a class="btn btn-default" href="{% url "checklists:detail" checklist.id %}">Cancel</a></p>
+            </form>
+        </div>
+    </div>
+    {% endwith %}
+{% endblock %}

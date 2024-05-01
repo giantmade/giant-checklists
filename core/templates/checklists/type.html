@@ -27,7 +27,7 @@
                     {% for item in checklists %}
                         <tr>
                             <td>
-                                <a href="{% url "checklists:detail" item.id %}">{{ item.title }}</a>
+                                <a href="{% url "checklists:detail" item.id %}">{{ item.title }}{% if item.bulk_mark_completed_at %}: Bulk marked as complete by {{ item.bulk_mark_completed_by }} at {{ item.bulk_mark_completed_at|date:"d/m/Y" }}{% endif %}</a>
                             </td>
                             <td>
                                 <div class="progress">
