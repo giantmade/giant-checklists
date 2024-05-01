@@ -51,7 +51,9 @@ class Checklist(models.Model):
         total_items = float(len(self.items()))
         completed_items = float(len(self.items().filter(completed=True)))
 
-        return int(round((completed_items / total_items) * 100))
+        if total_items:
+            return int(round((completed_items / total_items) * 100))
+        return 0
 
     def __str__(self):
         return self.title

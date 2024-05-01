@@ -8,6 +8,26 @@ from django.views.decorators.http import require_POST
 from . import forms, models
 
 
+def sort_checklists(checklists, sort_string, request):
+    if not sort_string:
+        return checklists
+
+    sort_parameter = re.search(r'sort-by-(.*)', sort_string).group(1)
+    sort_parameter = "-" + sort_parameter if request.GET.get(sort_string) == "desc" else sort_parameter
+
+    if "progress" in sort_parameter:
+        """ 
+        'Progress' is a method on model and therefore cannot be sorted as regular queryset
+        so in this case we will sort as a list instead.
+        """
+        progress_list = [(checklist, checklist.progress()) for checklist in checklists]
+        is_descending = True if "-" in sort_parameter else False
+        sorted_progress_list = sorted(progress_list, key=lambda x: x[1], reverse=is_descending)
+        return [item[0] for item in sorted_progress_list]
+
+    return checklists.order_by(sort_parameter)
+
+
 @never_cache
 @login_required
 def index(request):
@@ -23,21 +43,7 @@ def index(request):
         checklists = form.filter_checklists()
 
     sort_string = next((key for key in request.GET.keys() if key.startswith('sort-by-')), None)
-    if sort_string:
-        sort_parameter = re.search(r'sort-by-(.*)', sort_string).group(1)
-        sort_parameter = "-" + sort_parameter if request.GET.get(sort_string) == "desc" else sort_parameter
-
-        if "progress" in sort_parameter:
-            """ 
-            'Progress' is a method on model and therefore cannot be sorted as regular queryset
-            so in this case we will sort as a list instead.
-            """
-            progress_list = [(checklist, checklist.progress()) for checklist in checklists]
-            is_descending = True if "-" in sort_parameter else False
-            sorted_progress_list = sorted(progress_list, key=lambda x: x[1], reverse=is_descending)
-            checklists = [item[0] for item in sorted_progress_list]
-        else:
-            checklists = checklists.order_by(sort_parameter)
+    checklists = sort_checklists(checklists, sort_string, request)
 
     return render(
         request,
