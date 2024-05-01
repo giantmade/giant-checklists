@@ -17,8 +17,60 @@
                 <thead>
                 <tr>
                     <th>Title</th>
+                    <th>
+                        <div class="sortable-column-header">
+                            <div class="table-header-title">Author</div>
+
+                            <div class="button-container">
+                                <a class="arrow-button" href="{% url 'checklists:index' %}?sort-by-author=asc">
+                                  &#9650;
+                                </a>
+                                <a class="arrow-button" style="line-height: 1;" href="{% url 'checklists:index' %}?sort-by-author=desc">
+                                  &#9660;
+                                </a>
+                            </div>
+                        </div>
+                    </th>
                     <th>Category</th>
-                    <th>Progress</th>
+                    <th>
+                        <div class="sortable-column-header">
+                            <div class="table-header-title">Progress</div>
+                            <div class="button-container">
+                                <a class="arrow-button" href="{% url 'checklists:index' %}?sort-by-progress=asc">
+                                  &#9650;
+                                </a>
+                                <a class="arrow-button" style="line-height: 1;" href="{% url 'checklists:index' %}?sort-by-progress=desc">
+                                  &#9660;
+                                </a>
+                            </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sortable-column-header">
+                            <div class="table-header-title">Created On</div>
+                            <div class="button-container">
+                                <a class="arrow-button" href="{% url 'checklists:index' %}?sort-by-created_on=asc">
+                                  &#9650;
+                                </a>
+                                <a class="arrow-button" style="line-height: 1;" href="{% url 'checklists:index' %}?sort-by-created_on=desc">
+                                  &#9660;
+                                </a>
+                            </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sortable-column-header">
+                            <div class="table-header-title">Updated At</div>
+                            <div class="button-container">
+                                <a class="arrow-button" href="{% url 'checklists:index' %}?sort-by-updated_at=asc">
+                                  &#9650;
+                                </a>
+                                <a class="arrow-button" style="line-height: 1;" href="{% url 'checklists:index' %}?sort-by-updated_at=desc">
+                                  &#9660;
+                                </a>
+                            </div>
+                        </div>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -28,6 +80,9 @@
                             <a href="{% url "checklists:detail" item.id %}">{{ item.title }}</a>
                         </td>
                         <td>
+                            {% if item.author %}{{ item.author }}{% else %}None{% endif %}
+                        </td>
+                        <td>
                             {% if item.category %}{{ item.category }}{% else %}None{% endif %}
                         </td>
                         <td>
@@ -35,6 +90,8 @@
                                 <div class="progress-bar {% ifequal item.progress 100 %}bg-success{% endifequal %}" role="progressbar" style="width: {{ item.progress }}%" aria-valuenow="{{ item.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </td>
+                        <td>{{ item.created_on }}</td>
+                        <td>{{ item.updated_at }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

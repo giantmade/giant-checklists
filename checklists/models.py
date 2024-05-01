@@ -27,6 +27,7 @@ class Checklist(models.Model):
     title = models.CharField(max_length=255)
     notes = models.TextField(blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     completed = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,7 +51,9 @@ class Checklist(models.Model):
         total_items = float(len(self.items()))
         completed_items = float(len(self.items().filter(completed=True)))
 
-        return int(round((completed_items / total_items) * 100))
+        if total_items:
+            return int(round((completed_items / total_items) * 100))
+        return 0
 
     def __str__(self):
         return self.title
