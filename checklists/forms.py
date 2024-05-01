@@ -51,5 +51,3 @@ class ChecklistFilterForm(forms.Form):
         self.filter_by_template_type()
 
         return Checklist.objects.filter(self.query)
-
-
