@@ -17,3 +17,6 @@ class TemplateAdmin(admin.ModelAdmin):
         "is_active",
         "type",
     ]
+    list_filter = ["type", "is_active"]
+    search_fields = ["title", "author"]
+
