@@ -134,8 +134,6 @@ def detail(request, checklist_id):
 
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
     events = models.ChecklistEvent.objects.filter(checklist=checklist).order_by("-created_on")
-    print("EVENTS: ", events)
-    print("CHECKLIST: ", checklist)
 
     # Check for the 'all events' flag. If this is false,
     # only show 5 recent events in the event list.

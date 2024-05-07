@@ -42,9 +42,7 @@ def create(request, checklist_id=None):
 
             try:
                 checklist = get_object_or_404(Checklist, id=checklist_id)
-                print("REACHED!")
                 for checklist_item in checklist.checklist_items.all():
-                    print("checklist_item", checklist_item)
                     template_item = TemplateItem.objects.create(
                         template=template,
                         description=checklist_item.description,
