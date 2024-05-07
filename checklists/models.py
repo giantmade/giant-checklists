@@ -24,7 +24,7 @@ class Checklist(models.Model):
     This is an instance of a checklist.
     """
 
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=255)
     notes = models.TextField(blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -42,7 +42,8 @@ class Checklist(models.Model):
     bulk_mark_completed_at = models.DateTimeField(null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
-    # TODO: for future use, I want to hold a list of users here to be notified when the list is completed.
+    # TODO: for future use, I want to hold a list of users here to be
+    #  notified when the list is completed.
     notification_group = models.ManyToManyField(User, related_name="notification_users")
 
     def __str__(self):
@@ -60,8 +61,8 @@ class Checklist(models.Model):
         This calculates the percentage progress through the list.
         """
 
-        total_items = float(len(self.items()))
-        completed_items = float(len(self.items().filter(completed=True)))
+        total_items = float(self.checklist_items.count()) or 1
+        completed_items = float(self.checklist_items.filter(completed=True).count())
 
         if total_items:
             return int(round((completed_items / total_items) * 100))
@@ -79,7 +80,9 @@ class ChecklistItem(models.Model):
     This is an instance of a checklist item.
     """
 
-    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE)
+    checklist = models.ForeignKey(
+        Checklist, on_delete=models.CASCADE, related_name="checklist_items"
+    )
     original_item = models.ForeignKey(
         TemplateItem, blank=True, null=True, on_delete=models.CASCADE
     )
