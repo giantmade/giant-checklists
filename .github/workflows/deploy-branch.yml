@@ -4,9 +4,6 @@ name: Deploy Branch to dev.giantmade.net
 on:
   workflow_dispatch:
     inputs:
-      branch-type:
-        description: 'Branch Type to push: '
-        required: true
       branch-name: 
         description: 'Branch name to push: '
         required: true
@@ -29,76 +26,5 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cloning repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Get Client Name from GitHub Repository
-        id: client_name
-        run: |
-          echo "--- Github Repository String ---"
-          echo "$GITHUB_REPOSITORY"
-          echo
-          CLIENT_NAME=${GITHUB_REPOSITORY##*/}
-          echo "--- Sanitised Github Repository String ---"
-          echo "$CLIENT_NAME"
-          echo
-          echo "CLIENT_NAME=$CLIENT_NAME" >> $GITHUB_ENV
-
-      - name: 'Discover Requirements: MySQL'
-        id: install_sql
-        run: |
-          if cat docker-compose.yml | grep -q "image: mysql"; then INSTALL_MYSQL_FLAG="-m" && echo "MySQL container will be installed"; fi
-          echo "INSTALL_MYSQL_FLAG=$INSTALL_MYSQL_FLAG" >> $GITHUB_ENV
-
-      - name: 'Discover Requirements: Postgres'
-        id: install_postgres
-        run: |
-          if cat docker-compose.yml | grep -q "image: postgres"; then INSTALL_POSTGRES_FLAG="-p" && echo "Postgres container will be installed"; fi
-          echo "INSTALL_POSTGRES_FLAG=$INSTALL_POSTGRES_FLAG" >> $GITHUB_ENV
-
-      - name: 'Discover Requirements: Redis'
-        id: install_redis
-        run: |
-          if cat docker-compose.yml | grep -q "image: redis"; then INSTALL_REDIS_FLAG="-r" && echo "Redis container will be installed"; fi
-          echo "INSTALL_REDIS_FLAG=$INSTALL_REDIS_FLAG" >> $GITHUB_ENV
-
-      - name: 'Discover Requirements: ElasticSearch'
-        id: install_elastic
-        run: |
-          if cat docker-compose.yml | grep -q "image: elasticsearch"; then INSTALL_ELASTIC_FLAG="-e" && echo "ElasticSearch container will be installed"; fi
-          echo "INSTALL_ELASTIC_FLAG=$INSTALL_ELASTIC_FLAG" >> $GITHUB_ENV
-
-      - name: Create Dokku Environment
-        run: |
-          echo "---Creating new Deploy Environment on Dev Server---"
-          ssh github-actions@dev.giantmade.net sudo ./dokku-rich-clone.sh -b ${{ github.event.inputs.branch-type }} -n ${{ github.event.inputs.branch-name }} -c ${{ env.CLIENT_NAME }} ${{ env.INSTALL_MYSQL_FLAG }} ${{ env.INSTALL_POSTGRES_FLAG }} ${{ env.INSTALL_ELASTIC_FLAG }} ${{ env.INSTALL_REDIS_FLAG }} -y
-
-      - name: Push to dokku
-        id: dokku_push
-        uses: dokku/github-action@master
-        with:
-          # specify the current branch as the remote branch to push to
-          branch: ${{ github.head_ref }}
-          ssh_host_key: ${{ secrets.SSH_DEV_HOST_KEY }}
-          git_push_flags: '-vvv'
-          git_remote_url: 'ssh://dokku@dev.giantmade.net:22/${{ github.event.inputs.branch-type }}-${{ github.event.inputs.branch-name }}-${{ env.CLIENT_NAME }}'
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-
-      - name: Create comment with link to Dokku Web App
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.inputs.pr-number }}
-          body: |
-            Link to [site](https://${{ github.event.inputs.branch-type }}-${{ github.event.inputs.branch-name }}-${{ env.CLIENT_NAME }}.dev.giantmade.net). 
-
-      - name: Destroy Dokku Environment on close of PR.
-        if: github.event_name == 'pull_request' && github.event.action == 'closed'
-        run: |
-          echo "---Removing Deploy Environment on Dev Server---"
-          ssh github-actions@dev.giantmade.net ./dokku-destroy.sh -b ${{ github.event.inputs.branch-type }} -n ${{ github.event.inputs.branch-name }} -c ${{ env.CLIENT_NAME }} ${{ env.INSTALL_MYSQL_FLAG }} ${{ env.INSTALL_POSTGRES_FLAG }} ${{ env.INSTALL_ELASTIC_FLAG }} ${{ env.INSTALL_REDIS_FLAG }} -y
+    uses: giantmade/github-actions/.github/workflows/deploy-branch.yml@main
+    secrets: inherit

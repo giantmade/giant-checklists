@@ -8,34 +8,5 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cloning repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Get Client Name from GitHub Repository
-        id: client_name
-        run: |
-          echo "--- Github Repository String ---"
-          echo "$GITHUB_REPOSITORY"
-          echo
-          CLIENT_NAME=${GITHUB_REPOSITORY##*/}
-          echo "--- Sanitised Github Repository String ---"
-          echo "$CLIENT_NAME"
-          echo
-          echo "CLIENT_NAME=$CLIENT_NAME" >> $GITHUB_ENV
-
-      - name: Push to dokku
-        id: dokku_push
-        uses: dokku/github-action@master
-        with:
-          # specify the current branch as the remote branch to push to
-          branch: ${{ github.head_ref }}
-          ssh_host_key: ${{ secrets.SSH_DEV_HOST_KEY }}
-          git_push_flags: '-vvv'
-          git_remote_url: 'ssh://dokku@dev.giantmade.net:22/develop-${{ env.CLIENT_NAME }}'
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+    uses: giantmade/github-actions/.github/workflows/deploy-dev.yml@main
+    secrets: inherit

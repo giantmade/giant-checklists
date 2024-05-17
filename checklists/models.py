@@ -1,9 +1,22 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from positions import PositionField, PositionManager
 
 from templates.models import Template, TemplateItem
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return self.name
 
 
 class Checklist(models.Model):
@@ -11,15 +24,30 @@ class Checklist(models.Model):
     This is an instance of a checklist.
     """
 
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=255)
     notes = models.TextField(blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     completed = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    bulk_mark_completed_by = models.ForeignKey(
+        User,
+        related_name='checklists_bulk_mark_completed',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    bulk_mark_completed_at = models.DateTimeField(null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
-    # TODO: for future use, I want to hold a list of users here to be notified when the list is completed.
+    # TODO: for future use, I want to hold a list of users here to be
+    #  notified when the list is completed.
     notification_group = models.ManyToManyField(User, related_name="notification_users")
+
+    def __str__(self):
+        return self.title
 
     def items(self):
         """
@@ -33,13 +61,18 @@ class Checklist(models.Model):
         This calculates the percentage progress through the list.
         """
 
-        total_items = float(len(self.items()))
-        completed_items = float(len(self.items().filter(completed=True)))
+        total_items = float(self.checklist_items.count()) or 1
+        completed_items = float(self.checklist_items.filter(completed=True).count())
 
-        return int(round((completed_items / total_items) * 100))
+        if total_items:
+            return int(round((completed_items / total_items) * 100))
+        return 0
 
-    def __str__(self):
-        return self.title
+    def bulk_mark(self, user: User, mark_complete: bool):
+        self.completed = mark_complete
+        self.bulk_mark_completed_by = user if mark_complete else None
+        self.bulk_mark_completed_at = timezone.now() if mark_complete else None
+        self.save()
 
 
 class ChecklistItem(models.Model):
@@ -47,7 +80,9 @@ class ChecklistItem(models.Model):
     This is an instance of a checklist item.
     """
 
-    checklist = models.ForeignKey(Checklist, on_delete=models.CASCADE)
+    checklist = models.ForeignKey(
+        Checklist, on_delete=models.CASCADE, related_name="checklist_items"
+    )
     original_item = models.ForeignKey(
         TemplateItem, blank=True, null=True, on_delete=models.CASCADE
     )
@@ -57,6 +92,8 @@ class ChecklistItem(models.Model):
 
     completed = models.BooleanField(default=False)
     completed_on = models.DateTimeField(blank=True, null=True)
+
+    is_not_applicable = models.BooleanField(help_text="Not Applicable", default=False)
 
     objects = PositionManager()
 
@@ -77,6 +114,10 @@ class ChecklistItem(models.Model):
 
     def __str__(self):
         return self.description
+
+    def clean(self):
+        if self.is_not_applicable and self.completed:
+            raise ValidationError("A checklist item cannot be both complete and not applicable.")
 
 
 class ChecklistEvent(models.Model):

@@ -3,59 +3,14 @@ name: Lint & Autolint
 
 on:
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: 
+     - main
+     - develop
 
 jobs:
   lint-and-autolint:
-    name: Isort, Flake8, Black
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check Out Source Repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Load Cached Dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Setup Python Environment
-        uses: actions/setup-python@main
-        with:
-          python-version: "3.9.x"
-
-      - name: Install Linters
-        run: pip install black flake8 isort
-
-      # If this runs the workflow fails, need to add isort to wearerequired/lint-action
-      - name: Run Isort
-        uses: isort/isort-action@master
-        with:
-          sortPaths: ./checklists
-          configuration: "--profile black"
-
-      - name: Run Flake8
-        uses: julianwachholz/flake8-action@v2
-        with:
-          path: .
-          plugins: flake8-quotes
-          config: setup.cfg
-          isTest: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run Black
-        uses: wearerequired/lint-action@v2
-        with:
-          black: true
-          black_dir: ./checklists
-          black_args: "--verbose"
-          auto_fix: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    name: Isort, Flake8 & Black
+    uses: giantmade/github-actions/.github/workflows/lint.yml@main
+    secrets: inherit
+    with:
+      python-version: "3.9.x"

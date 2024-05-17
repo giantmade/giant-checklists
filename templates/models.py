@@ -1,10 +1,18 @@
 from django.db import models
 
-# from instances.models import Checklist, ChecklistItem
 from django.contrib.auth.models import User
+from django.db import models
 
 from positions.fields import PositionField
 from positions.managers import PositionManager
+
+
+class TemplateType(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Template(models.Model):
@@ -16,6 +24,12 @@ class Template(models.Model):
     description = models.TextField(blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
+    type = models.ForeignKey(
+        TemplateType,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="templates",
+    )
 
     def __str__(self):
         return self.title
@@ -30,7 +44,7 @@ class Template(models.Model):
 
 class TemplateItem(models.Model):
     """
-    This is a checklist item.
+    This is a checis_klist item.
     """
 
     template = models.ForeignKey(Template, on_delete=models.CASCADE)

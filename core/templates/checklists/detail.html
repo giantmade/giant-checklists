@@ -10,6 +10,7 @@
 {% block body %}
     <div class="row">
         <div class="col-md-8">
+        {% if checklist.checklist_items.all %}
             <table class="table table-borderless table-striped">
                 <thead>
                 <tr>
@@ -18,7 +19,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in checklist.items %}
+                {% for item in checklist.checklist_items.all %}
                     <tr>
                         <td class="align-middle">
                             {% if item.completed %}
@@ -35,24 +36,41 @@
                                 </button>
                             {% else %}
                                 <!-- Mark complete -->
-                                <button type="button" class="btn btn-success m-r-10" data-toggle="modal" data-target="#item-complete-toggle-{{ item.id }}">
+                                <button type="button" class="btn btn-success m-r-10" data-toggle="modal" data-target="#item-complete-toggle-{{ item.id }}" {% if item.is_not_applicable %}disabled{% endif %}>
                                     <i class="bi bi-check"></i> Complete
                                 </button>
                             {% endif %}
                             <!-- Comment -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#item-comment-{{ item.id }}">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#item-comment-{{ item.id }}" {% if item.is_not_applicable %}disabled{% endif %}>
                             <i class="bi bi-chat-square-text"></i> Comment
                                 {% if item.comments %}
                                     <span class="badge">{{ item.comment_count }}</span>
                                 {% endif %}
                             </span>
                             </button>
+                            {% if item.is_not_applicable %}
+                                <!-- Mark not applicable  -->
+                                <button type="button" class="btn btn-primary m-r-10" data-toggle="modal" data-target="#item-applicable-toggle-{{ item.id }}">
+                                    <i class="bi bi-x"></i> Is Applicable
+                                </button>
+                            {% else %}
+                                <!-- Mark complete -->
+                                <button type="button" class="btn btn-success m-r-10" data-toggle="modal" data-target="#item-applicable-toggle-{{ item.id }}">
+                                    <i class="bi bi-check"></i> Not Applicable
+                                </button>
+                            {% endif %}
                         </td>
 
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
+        {% endif %}
+            <form action="{% url 'checklists:append_item' checklist.id %}" method="POST">
+                {% csrf_token %}
+                <input type="text" name="item_description" placeholder="Checklist item text" required/>
+                <button type="submit" class="btn" >Add checklist item</button>
+            </form>
         </div>
 
         <div class="col-md-4 border-left pt-3 pr-3">
@@ -63,7 +81,7 @@
 
             {% ifequal checklist.progress 100 %}
                 <!-- Complete checklist toggle -->
-                <form class="mt-3" method="post" action="{% url "checklists:complete_toggle" checklist.id %}">
+                <form class="mt-3" method="post" action="{% url "checklists:checklist_toggle" checklist.id "complete" %}">
                     {% csrf_token %}
                     {% if checklist.completed %}
                         <button type="submit" class="btn btn-danger">Not Complete!</button>
@@ -73,7 +91,20 @@
                 </form>
             {% endifequal %}
 
+            <!-- Archive checklist toggle -->
+            <form class="mt-3" method="post" action="{% url "checklists:checklist_toggle" checklist.id "archive" %}">
+                {% csrf_token %}
+                {% if checklist.archived %}
+                    <button type="submit" class="btn btn-danger">Remove from Archive</button>
+                {% else %}
+                    <button type="submit" class="btn btn-success btn-default" >Archive Checklist</button>
+                {% endif %}
+            </form>
+
             <p class="mt-3"><a class="btn btn-danger" href="{% url "checklists:delete" checklist.id %}">Delete Checklist</a></p>
+
+            <p class="mt-3"><a class="btn btn-warning" href="{% url "checklists:bulk_mark_complete" checklist.id %}">Bulk mark Checklist as {% if not checklist.bulk_mark_completed_by %}Complete{% else %}Incomplete{% endif %}</a></p>
+
 
             <p class="mt-3"><strong>Notes</strong></p>
             {% if checklist.notes %}
@@ -109,14 +140,26 @@
     </div>
 
     <!-- Item complete modals. -->
-    {% for item in checklist.items %}
+    {% for item in checklist.checklist_items.all %}
         {% include "checklists/partials/_checklistitem_complete.html" %}
     {% endfor %}
 
     <!-- Item comment modals. -->
-    {% for item in checklist.items %}
+    {% for item in checklist.checklist_items.all %}
         {% include "checklists/partials/_checklistitem_comment_modal.html" %}
     {% endfor %}
+
+    {% for item in checklist.checklist_items.all %}
+        {% include "checklists/partials/_checklistitem_applicable.html" %}
+    {% endfor %}
+
+    {% if create_template %}
+        <p>You made a new checklist, do you want to add this to the list of available templates?</p>
+        <form method="GET" action="{% url 'templates:create_from_checklist' checklist.id %}">
+            {% csrf_token %}
+            <button>Create Template</button>
+        </form>
+    {% endif %}
 
     <!-- Edit notes modal. -->
     {% include "checklists/partials/_checklist_notes_edit.html" %}

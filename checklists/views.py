@@ -1,9 +1,31 @@
+import re
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from . import forms, models
+
+
+def sort_checklists(checklists, sort_string, request):
+    if not sort_string:
+        return checklists
+
+    sort_parameter = re.search(r'sort-by-(.*)', sort_string).group(1)
+    sort_parameter = "-" + sort_parameter if request.GET.get(sort_string) == "desc" else sort_parameter
+
+    if "progress" in sort_parameter:
+        """ 
+        'Progress' is a method on model and therefore cannot be sorted as regular queryset
+        so in this case we will sort as a list instead.
+        """
+        progress_list = [(checklist, checklist.progress()) for checklist in checklists]
+        is_descending = True if "-" in sort_parameter else False
+        sorted_progress_list = sorted(progress_list, key=lambda x: x[1], reverse=is_descending)
+        return [item[0] for item in sorted_progress_list]
+
+    return checklists.order_by(sort_parameter)
 
 
 @never_cache
@@ -13,31 +35,45 @@ def index(request):
     This is the index view for checklists.
     """
 
-    checklists = models.Checklist.objects.filter(completed=False)
+    checklists = models.Checklist.objects.filter(completed=False, archived=False)
+
+    form = forms.ChecklistFilterForm(request.GET or None)
+
+    if form.is_valid():
+        checklists = form.filter_checklists()
+
+    sort_string = next((key for key in request.GET.keys() if key.startswith('sort-by-')), None)
+    checklists = sort_checklists(checklists, sort_string, request)
 
     return render(
         request,
         "checklists/index.html",
         {
             "checklists": checklists,
+            "form": form,
         },
     )
 
 
 @never_cache
 @login_required
-def complete(request):
+def type(request, checklist_type):
     """
     This is the index view for completed checklists.
     """
 
-    checklists = models.Checklist.objects.filter(completed=True)
+    checklists = (
+        models.Checklist.objects.filter(completed=True)
+        if checklist_type == "complete"
+        else models.Checklist.objects.filter(archived=True)
+    )
 
     return render(
         request,
-        "checklists/complete.html",
+        "checklists/type.html",
         {
             "checklists": checklists,
+            "type": checklist_type,
         },
     )
 
@@ -59,14 +95,15 @@ def create(request):
             checklist.save()
 
             # Add the child items.
-            for item in checklist.template.items().order_by("position"):
-                checklist_item = models.ChecklistItem(
-                    checklist=checklist,
-                    original_item=item,
-                    description=item.description,
-                    position=item.position,
-                )
-                checklist_item.save()
+            if checklist.template:
+                for item in checklist.template.items().order_by("position"):
+                    checklist_item = models.ChecklistItem(
+                        checklist=checklist,
+                        original_item=item,
+                        description=item.description,
+                        position=item.position,
+                    )
+                    checklist_item.save()
 
             # Create an event.
             event = models.ChecklistEvent(
@@ -98,7 +135,8 @@ def detail(request, checklist_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
     events = models.ChecklistEvent.objects.filter(checklist=checklist).order_by("-created_on")
 
-    # Check for the 'all events' flag. If this is false, only show 5 recent events in the event list.
+    # Check for the 'all events' flag. If this is false,
+    # only show 5 recent events in the event list.
     all_events = "all_events" in request.GET
 
     return render(
@@ -108,6 +146,7 @@ def detail(request, checklist_id):
             "checklist": checklist,
             "events": events,
             "all_events": all_events,
+            "create_template": True if not checklist.template else False,
         },
     )
 
@@ -147,7 +186,7 @@ def edit_notes(request, checklist_id):
 @never_cache
 @login_required
 @require_POST
-def complete_toggle(request, checklist_id):
+def checklist_toggle(request, checklist_id, checklist_type):
     """
     This toggles the 'completed' status of a given checklist.
     """
@@ -155,7 +194,7 @@ def complete_toggle(request, checklist_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
     # Mark as incomplete, return to detail page.
-    if checklist.completed:
+    if checklist_type == "complete" and checklist.completed:
         checklist.completed = False
         checklist.save()
 
@@ -168,7 +207,7 @@ def complete_toggle(request, checklist_id):
         event.save()
 
     # Mark as complete, return to index page.
-    else:
+    elif checklist_type == "complete" and not checklist.completed:
         checklist.completed = True
         checklist.save()
 
@@ -179,14 +218,35 @@ def complete_toggle(request, checklist_id):
             message="Marked the checklist as complete.",
         )
         event.save()
+    elif checklist_type == "archive" and checklist.archived:
+        checklist.archived = False
+        checklist.save()
 
+        # Create an event.
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Removed the checklist from the archive.",
+        )
+        event.save()
+    else:
+        checklist.archived = True
+        checklist.save()
+
+        # Create an event.
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Added the checklist to the archive.",
+        )
+        event.save()
     return redirect("checklists:detail", checklist_id=checklist.id)
 
 
 @never_cache
 @login_required
 @require_POST
-def item_complete_toggle(request, checklist_id, item_id):
+def item_boolean_field_toggle(request, checklist_id, item_id, field):
     """
     This toggles the completed status of a given item.
     """
@@ -194,7 +254,7 @@ def item_complete_toggle(request, checklist_id, item_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
     item = get_object_or_404(models.ChecklistItem, checklist=checklist, id=item_id)
 
-    if item.completed:
+    if field == "complete" and item.completed:
         item.completed = False
 
         # Create an event.
@@ -204,8 +264,9 @@ def item_complete_toggle(request, checklist_id, item_id):
             message="Marked the item '%s' as incomplete." % item.description,
         )
         event.save()
-    else:
+    elif field == "complete" and not item.completed:
         item.completed = True
+        item.is_not_applicable = False
 
         # Create an event.
         event = models.ChecklistEvent(
@@ -214,7 +275,28 @@ def item_complete_toggle(request, checklist_id, item_id):
             message="Marked the item '%s' as complete." % item.description,
         )
         event.save()
+    elif field == "applicable" and item.is_not_applicable:
+        item.is_not_applicable = False
 
+        # Create an event.
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Marked the item '%s' as applicable." % item.description,
+        )
+        event.save()
+    else:
+        item.is_not_applicable = True
+        item.complete = False
+
+        event = models.ChecklistEvent(
+            checklist=checklist,
+            author=request.user,
+            message="Marked the item '%s' as not applicable." % item.description,
+        )
+        event.save()
+
+    checklist.save()  # to refresh the updated_at date/ time value
     item.save()
 
     return redirect("checklists:detail", checklist_id=checklist.id)
@@ -239,6 +321,43 @@ def item_comment(request, checklist_id, item_id):
         content=request.POST["content"],
     )
     comment.save()
+    checklist.save()  # to refresh the updated_at date/ time value
 
     # Return to the template detail page.
     return redirect("checklists:detail", checklist_id=checklist.id)
+
+
+@never_cache
+@login_required
+def append_item(request, checklist_id):
+    """
+    This handles a checklist item being added post checklist creation.
+    """
+
+    checklist = get_object_or_404(models.Checklist, id=checklist_id)
+
+    if request.method == "POST" :
+        models.ChecklistItem.objects.create(
+            checklist=checklist,
+            description=request.POST.get("item_description"),
+        )
+        checklist.save()  # to refresh the updated_at date/ time value
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+@never_cache
+@login_required
+def bulk_mark_complete(request, checklist_id):
+    """
+    This deals with bulk marking a checklist as complete.
+    """
+
+    checklist = get_object_or_404(models.Checklist, id=checklist_id)
+
+    if request.method == "POST":
+        is_mark_complete = True if not checklist.bulk_mark_completed_by else False
+        checklist.bulk_mark(user=request.user, mark_complete=is_mark_complete)
+        return redirect("checklists:index")
+
+    return render(request, "checklists/mark_as_complete.html", {"checklist": checklist})
