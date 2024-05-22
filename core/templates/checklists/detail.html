@@ -105,6 +105,14 @@
 
             <p class="mt-3"><a class="btn btn-warning" href="{% url "checklists:bulk_mark_complete" checklist.id %}">Bulk mark Checklist as {% if not checklist.bulk_mark_completed_by %}Complete{% else %}Incomplete{% endif %}</a></p>
 
+            <p class="mt-3"><strong>Category</strong></p>
+            {% if checklist.category %}
+                <p>{{ checklist.category }}</p>
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#category-{{ checklist.id }}">Edit</a>
+            {% else %}
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#category-{{ checklist.id }}">Add Category</a>
+            {% endif %}
+
 
             <p class="mt-3"><strong>Notes</strong></p>
             {% if checklist.notes %}
@@ -161,7 +169,8 @@
         </form>
     {% endif %}
 
-    <!-- Edit notes modal. -->
+    <!-- Edit field modals. -->
+    {% include "checklists/partials/_checklist_category_edit.html" with form=edit_category_form %}
     {% include "checklists/partials/_checklist_notes_edit.html" %}
 
 {% endblock %}

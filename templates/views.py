@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 from loguru import logger
 
 from checklists.models import Checklist
+from core.utils import create_form_category
 
 from . import forms, models
 from .models import TemplateItem, TemplateType
@@ -20,22 +21,13 @@ def index(request):
     This is the index view for templates.
     """
 
-    admin_class = site._registry[TemplateType]
-    category_form_class = admin_class.get_form(request)
-    category_form = category_form_class()
-    category_message = None
-    if request.method == "POST" and "name" in request.POST:
-        category_form = category_form_class(request.POST)
-        if category_form.is_valid():
-            category_form.save()
-            category_message = f"Template Type '{category_form.cleaned_data['name']}' successfully created"
-            category_form = category_form_class()
+    form, message = create_form_category(request, TemplateType)
 
     templates = models.Template.objects.filter(is_active=True)
 
     return render(
         request, "templates/index.html",
-        {"templates": templates, "form": category_form, "template_type_message": category_message},
+        {"templates": templates, "form": form, "template_type_message": message},
     )
 
 

@@ -119,27 +119,4 @@
     </div>
 {% endblock %}
 
-{% block extra_js %}
-    <script type="text/javascript">
-        $(document).ready(function() {
-            var $name = $('#id_name');
-            var $slug = $('#id_slug');
-
-            function updateSlug() {
-                var nameVal = $name.val();
-                // Replace spaces with hyphens and convert to lowercase
-                var slugVal = nameVal.replace(/\s+/g, '-').toLowerCase();
-                $slug.val(slugVal);
-            }
-
-            $name.on('keyup', function() {
-                updateSlug();
-            });
-
-            // Trigger the slug update on page load if the name field already has a value
-            if ($name.val()) {
-                updateSlug();
-            }
-        });
-    </script>
-{% endblock %}
+{% block extra_js %}{% endblock %}

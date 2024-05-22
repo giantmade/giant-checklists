@@ -11,6 +11,7 @@ urlpatterns = [
     url(r"^create/$", views.create, name="create"),
     url(r"^(?P<checklist_id>\d+)/$", views.detail, name="detail"),
     url(r"^(?P<checklist_id>\d+)/edit_notes/$", views.edit_notes, name="edit_notes"),
+    url(r"^(?P<checklist_id>\d+)/edit_category/$", views.edit_category, name="edit_category"),
     url(
         r"^(?P<checklist_id>\d+)/checklist_toggle/(?P<checklist_type>\w+)$",
         views.checklist_toggle,

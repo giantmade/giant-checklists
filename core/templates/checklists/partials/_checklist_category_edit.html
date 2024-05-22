@@ -1,0 +1,21 @@
+<div class="modal fade" id="category-{{ checklist.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Category</h4>
+            </div>
+            <form action="{% url "checklists:edit_category" checklist.id %}" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        {{ form.category }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Edit</input>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
