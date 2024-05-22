@@ -20,6 +20,11 @@
                     {% for error in form.title.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
                 </div>
 
+                <div class="form-group">
+                    <p><label for="{{ form.type.id_for_label }}"><strong>Type</strong></label></p>
+                    {{ form.type }}
+                </div>
+
                 <div class="form-group pt-3">
                     <p><label for="{{ form.description.id_for_label }}"><strong>Description</strong></label></p>
                     <p>If this checklist needs any extra information, describe it here. This will be displayed to anyone who is creating a new instance of this checklist.</p>

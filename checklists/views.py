@@ -1,11 +1,13 @@
 import re
 
+from django.contrib.admin import site
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
 from . import forms, models
+from .models import Category
 
 
 def sort_checklists(checklists, sort_string, request):
@@ -36,11 +38,21 @@ def index(request):
     """
 
     checklists = models.Checklist.objects.filter(completed=False, archived=False)
+    filter_form = forms.ChecklistFilterForm(request.GET or None)
 
-    form = forms.ChecklistFilterForm(request.GET or None)
+    admin_class = site._registry[Category]
+    category_form_class = admin_class.get_form(request)
+    category_form = category_form_class()
+    category_message = None
+    if request.method == "POST" and "name" in request.POST:
+        category_form = category_form_class(request.POST)
+        if category_form.is_valid():
+            category_form.save()
+            category_message = f"Category '{category_form.cleaned_data['name']}' successfully created"
+            category_form = category_form_class()
 
-    if form.is_valid():
-        checklists = form.filter_checklists()
+    if filter_form.is_valid():
+        checklists = filter_form.filter_checklists()
 
     sort_string = next((key for key in request.GET.keys() if key.startswith('sort-by-')), None)
     checklists = sort_checklists(checklists, sort_string, request)
@@ -50,7 +62,9 @@ def index(request):
         "checklists/index.html",
         {
             "checklists": checklists,
-            "form": form,
+            "filter_form": filter_form,
+            "category_form": category_form,
+            "category_message": category_message,
         },
     )
 

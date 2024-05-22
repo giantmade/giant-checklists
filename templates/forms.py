@@ -1,5 +1,7 @@
 from django import forms
 
+from templates.models import TemplateType
+
 
 class TemplateForm(forms.Form):
     """
@@ -7,6 +9,11 @@ class TemplateForm(forms.Form):
     """
 
     title = forms.CharField(required=True)
+    type = forms.ModelChoiceField(
+        queryset=TemplateType.objects.all(),
+        empty_label="Create without type",
+        required=False,
+    )
     description = forms.CharField(required=False, widget=forms.Textarea())
     initial_items = forms.CharField(required=False, widget=forms.Textarea())
     edit_immediately = forms.BooleanField(required=False, widget=forms.CheckboxInput)

@@ -1,3 +1,4 @@
+from django.contrib.admin import site
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,7 +10,7 @@ from loguru import logger
 from checklists.models import Checklist
 
 from . import forms, models
-from .models import TemplateItem
+from .models import TemplateItem, TemplateType
 
 
 @never_cache
@@ -19,9 +20,23 @@ def index(request):
     This is the index view for templates.
     """
 
+    admin_class = site._registry[TemplateType]
+    category_form_class = admin_class.get_form(request)
+    category_form = category_form_class()
+    category_message = None
+    if request.method == "POST" and "name" in request.POST:
+        category_form = category_form_class(request.POST)
+        if category_form.is_valid():
+            category_form.save()
+            category_message = f"Template Type '{category_form.cleaned_data['name']}' successfully created"
+            category_form = category_form_class()
+
     templates = models.Template.objects.filter(is_active=True)
 
-    return render(request, "templates/index.html", {"templates": templates})
+    return render(
+        request, "templates/index.html",
+        {"templates": templates, "form": category_form, "template_type_message": category_message},
+    )
 
 
 @never_cache
