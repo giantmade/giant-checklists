@@ -44,3 +44,10 @@ class TemplateFromChecklistForm(TemplateForm):
 
         self.fields["checklist"].initial = checklist_id
         self.fields["initial_items"].label = "Additional Items"
+
+
+class EditTemplateTypeForm(forms.Form):
+
+    type = forms.ModelChoiceField(
+        queryset=TemplateType.objects.all(), empty_label="--No type selected--", required=False,
+    )

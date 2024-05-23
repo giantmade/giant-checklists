@@ -11,6 +11,7 @@ from checklists.models import Checklist
 from core.utils import create_form_category
 
 from . import forms, models
+from .forms import EditTemplateTypeForm
 from .models import TemplateItem, TemplateType
 
 
@@ -91,7 +92,10 @@ def detail(request, template_id):
 
     template = get_object_or_404(models.Template, id=template_id)
 
-    return render(request, "templates/detail.html", {"template": template})
+    return render(
+        request, "templates/detail.html",
+{"template": template, "form": EditTemplateTypeForm(initial={"type": template.type})},
+    )
 
 
 @never_cache
@@ -121,6 +125,25 @@ def description(request, template_id):
     template = get_object_or_404(models.Template, id=template_id)
 
     template.description = request.POST["description"]
+    template.save()
+
+    return redirect("templates:detail", template_id=template.id)
+
+
+@never_cache
+@login_required
+@require_POST
+def type(request, template_id):
+    """
+    This changes a template type.
+    """
+
+    template = get_object_or_404(models.Template, id=template_id)
+
+    template.type = None
+    if request.POST["type"]:
+        template.type = TemplateType.objects.filter(pk=int(request.POST["type"])).first()
+
     template.save()
 
     return redirect("templates:detail", template_id=template.id)

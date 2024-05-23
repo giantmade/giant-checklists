@@ -75,7 +75,17 @@
 
             <p>This is a list of all the checklist items.</p>
             <p>You can amend this list as necessary, but remember that any previously created 'instances' of this list will not be affected.</p>
- 
+
+             <p><strong>Type</strong></p>
+
+            {% if template.type %}
+                <p>{{ template.type }}</p>
+            {% else %}
+                <p>This template has not been given a type.</p>
+            {% endif %}
+
+             <p><button id="template-type-{{ template.id }}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#type-{{ template.id }}">Edit type</button></p>
+
             <p><strong>Description</strong></p>
 
             {% if template.description %}
@@ -89,7 +99,8 @@
         </div>
     </div>
 
-    <!-- Template description modal. -->
+    <!-- Template edit modals. -->
+    {% include "templates/partials/_template_type_modal.html" %}
     {% include "templates/partials/_template_description_modal.html" %}
 
     <!-- Template delete modal. -->
