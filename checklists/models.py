@@ -74,6 +74,17 @@ class Checklist(models.Model):
         self.bulk_mark_completed_at = timezone.now() if mark_complete else None
         self.save()
 
+    def update_complete_status(self):
+        """
+        Independently update status considering non-applicable items
+        """
+
+        self.completed = not any([
+            (not item.completed and not item.is_not_applicable)
+            for item in self.items()
+        ])
+        self.save()
+
 
 class ChecklistItem(models.Model):
     """

@@ -321,8 +321,8 @@ def item_boolean_field_toggle(request, checklist_id, item_id, field):
         )
         event.save()
 
-    checklist.save()  # to refresh the updated_at date/ time value
     item.save()
+    checklist.update_complete_status()
 
     return redirect("checklists:detail", checklist_id=checklist.id)
 
