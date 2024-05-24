@@ -34,7 +34,20 @@
         <div class="col-md-4 border-left pt-2 pb-2">
             <p>This is the list of checklists templates</p>
             <p><a class="btn btn-primary" href="{% url "templates:create" %}">Create template</a></p>
+
+            <h2>Create a new template type</h2>
+
+            <form action="." method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <button type="submit">Create</button>
+                {% if template_type_message %}
+                    <p>{{ template_type_message }}</p>
+                {% endif %}
+            </form>
         </div>
         
     </div>
 {% endblock %}
+
+{% block extra_js %}{% endblock %}

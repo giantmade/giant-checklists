@@ -1,3 +1,4 @@
+from django.contrib.admin import site
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -7,9 +8,11 @@ from django.views.decorators.http import require_POST
 from loguru import logger
 
 from checklists.models import Checklist
+from core.utils import create_form_category
 
 from . import forms, models
-from .models import TemplateItem
+from .forms import EditTemplateTypeForm
+from .models import TemplateItem, TemplateType
 
 
 @never_cache
@@ -19,9 +22,14 @@ def index(request):
     This is the index view for templates.
     """
 
+    form, message = create_form_category(request, TemplateType)
+
     templates = models.Template.objects.filter(is_active=True)
 
-    return render(request, "templates/index.html", {"templates": templates})
+    return render(
+        request, "templates/index.html",
+        {"templates": templates, "form": form, "template_type_message": message},
+    )
 
 
 @never_cache
@@ -84,7 +92,10 @@ def detail(request, template_id):
 
     template = get_object_or_404(models.Template, id=template_id)
 
-    return render(request, "templates/detail.html", {"template": template})
+    return render(
+        request, "templates/detail.html",
+{"template": template, "form": EditTemplateTypeForm(initial={"type": template.type})},
+    )
 
 
 @never_cache
@@ -114,6 +125,25 @@ def description(request, template_id):
     template = get_object_or_404(models.Template, id=template_id)
 
     template.description = request.POST["description"]
+    template.save()
+
+    return redirect("templates:detail", template_id=template.id)
+
+
+@never_cache
+@login_required
+@require_POST
+def type(request, template_id):
+    """
+    This changes a template type.
+    """
+
+    template = get_object_or_404(models.Template, id=template_id)
+
+    template.type = None
+    if request.POST["type"]:
+        template.type = TemplateType.objects.filter(pk=int(request.POST["type"])).first()
+
     template.save()
 
     return redirect("templates:detail", template_id=template.id)

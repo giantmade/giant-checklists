@@ -5,7 +5,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
+from core.utils import create_form_category
 from . import forms, models
+from .forms import EditCategoryForm
+from .models import Category
 
 
 def sort_checklists(checklists, sort_string, request):
@@ -36,11 +39,12 @@ def index(request):
     """
 
     checklists = models.Checklist.objects.filter(completed=False, archived=False)
+    filter_form = forms.ChecklistFilterForm(request.GET or None)
 
-    form = forms.ChecklistFilterForm(request.GET or None)
+    category_form, category_message = create_form_category(request, Category)
 
-    if form.is_valid():
-        checklists = form.filter_checklists()
+    if filter_form.is_valid():
+        checklists = filter_form.filter_checklists()
 
     sort_string = next((key for key in request.GET.keys() if key.startswith('sort-by-')), None)
     checklists = sort_checklists(checklists, sort_string, request)
@@ -50,7 +54,9 @@ def index(request):
         "checklists/index.html",
         {
             "checklists": checklists,
-            "form": form,
+            "filter_form": filter_form,
+            "category_form": category_form,
+            "category_message": category_message,
         },
     )
 
@@ -147,6 +153,7 @@ def detail(request, checklist_id):
             "events": events,
             "all_events": all_events,
             "create_template": True if not checklist.template else False,
+            "edit_category_form": EditCategoryForm(initial={"category": checklist.category}),
         },
     )
 
@@ -182,6 +189,24 @@ def edit_notes(request, checklist_id):
 
     return redirect("checklists:detail", checklist_id=checklist.id)
 
+
+@never_cache
+@login_required
+@require_POST
+def edit_category(request, checklist_id):
+    """
+    Updates the category field on a checklist.
+    """
+
+    checklist = get_object_or_404(models.Checklist, id=checklist_id)
+
+    checklist.category = None
+    if request.POST["category"]:
+        checklist.category = Category.objects.filter(pk=int(request.POST["category"])).first()
+
+    checklist.save()
+
+    return redirect("checklists:detail", checklist_id=checklist.id)
 
 @never_cache
 @login_required
