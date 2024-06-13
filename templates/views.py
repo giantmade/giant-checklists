@@ -108,7 +108,7 @@ def edit(request, template_id):
 
     template = get_object_or_404(models.Template, id=template_id)
 
-    template.title = request.POST["title"]
+    template.title = request.POST.get("title")
     template.save()
 
     return redirect("templates:index")
@@ -124,7 +124,7 @@ def description(request, template_id):
 
     template = get_object_or_404(models.Template, id=template_id)
 
-    template.description = request.POST["description"]
+    template.description = request.POST.get("description")
     template.save()
 
     return redirect("templates:detail", template_id=template.id)
@@ -141,8 +141,8 @@ def type(request, template_id):
     template = get_object_or_404(models.Template, id=template_id)
 
     template.type = None
-    if request.POST["type"]:
-        template.type = TemplateType.objects.filter(pk=int(request.POST["type"])).first()
+    if template_type := request.POST.get("type"):
+        template.type = TemplateType.objects.filter(pk=int(template_type)).first()
 
     template.save()
 
@@ -262,7 +262,7 @@ def item_edit(request, template_id, item_id):
     item = get_object_or_404(models.TemplateItem, template=template, id=item_id)
 
     # Save the new value.
-    item.description = request.POST["description"]
+    item.description = request.POST.get("description")
     item.save()
 
     # Return to the template detail page.

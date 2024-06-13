@@ -184,7 +184,7 @@ def edit_notes(request, checklist_id):
 
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
-    checklist.notes = request.POST["notes"]
+    checklist.notes = request.POST.get("notes")
     checklist.save()
 
     return redirect("checklists:detail", checklist_id=checklist.id)
@@ -201,8 +201,8 @@ def edit_category(request, checklist_id):
     checklist = get_object_or_404(models.Checklist, id=checklist_id)
 
     checklist.category = None
-    if request.POST["category"]:
-        checklist.category = Category.objects.filter(pk=int(request.POST["category"])).first()
+    if category := request.POST.get("category"):
+        checklist.category = Category.objects.filter(pk=int(category)).first()
 
     checklist.save()
 
@@ -343,7 +343,7 @@ def item_comment(request, checklist_id, item_id):
     comment = models.ChecklistItemComment(
         item=item,
         author=request.user,
-        content=request.POST["content"],
+        content=request.POST.get("content"),
     )
     comment.save()
     checklist.save()  # to refresh the updated_at date/ time value
