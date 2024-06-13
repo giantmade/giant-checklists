@@ -16,6 +16,7 @@ urlpatterns = [
     url(r"^(?P<template_id>\d+)/$", views.detail, name="detail"),
     url(r"^(?P<template_id>\d+)/edit/$", views.edit, name="edit"),
     url(r"^(?P<template_id>\d+)/description/$", views.description, name="description"),
+    url(r"^(?P<template_id>\d+)/type/$", views.type, name="type"),
     url(r"^(?P<template_id>\d+)/delete/$", views.delete, name="delete"),
     # TemplateItem views.
     url(r"^(?P<template_id>\d+)/items/create/", views.item_create, name="item_create"),
