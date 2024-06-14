@@ -1,11 +1,11 @@
 from django.contrib.admin import site
+from django.forms import modelform_factory
 
 
 def create_form_category(request, category_class):
     """View logic for creating a category for different models based on admin form"""
 
-    admin_class = site._registry[category_class]
-    form_class = admin_class.get_form(request)
+    form_class = modelform_factory(category_class, fields=["name", "slug"])
     form = form_class()
     message = None
     if request.method == "POST" and "name" in request.POST:

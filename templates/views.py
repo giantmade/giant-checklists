@@ -45,7 +45,11 @@ def create(request, checklist_id=None):
         if form.is_valid():
 
             # First, create the checklist.
-            template = models.Template(title=form.cleaned_data["title"], author=request.user)
+            template = models.Template(
+                title=form.cleaned_data["title"],
+                author=request.user,
+                type=form.cleaned_data["type"],
+            )
             template.save()
 
             try:
